@@ -87,6 +87,102 @@ export class Input<
     )
   }
 
+  group<
+    TMsg extends string,
+    TExp extends string,
+    TPrevExp extends string,
+    TNames extends string[],
+    TGroups extends string[],
+    IsCorrectType = Contains<TMsg, "">,
+    InstanceError = "❌ Only finalized expressions of type 'TypedRegExp' can be appended",
+    HasOverlap extends string | false = Overlaps<TNames, GroupNames>,
+    OverlapError = `❌ The name '${HasOverlap}' has already been used. Make sure none of the following names are duplicated: ${Join<GroupNames>}`
+  >(
+    instance: Assert<IsCorrectType, true, InstanceError> &
+      TypedRegExp<State<TMsg, TExp, TPrevExp, [...TNames], [...TGroups]>> &
+      Assert<HasOverlap, false, OverlapError>
+  ) {
+    const newState = this.appendState(instance, false)
+    const group = `(?:${newState.prevExpression}${newState.curExpression})` as const
+    return new TypedRegExp({
+      ...newState,
+      curExpression: group,
+      prevExpression: "",
+    })
+  }
+
+  namedCapture<
+    TMsg extends string,
+    TExp extends string,
+    TPrevExp extends string,
+    TNames extends string[],
+    TGroups extends string[],
+    Name extends string,
+    ContainsValue = OfLength<Name, number>,
+    NameError = `❌ The Name '${Name}' must be a non-empty string`,
+    HasOverlap1 extends string | false = Overlaps<[Name], GroupNames>,
+    OverlapError1 = `❌ The Name '${HasOverlap1}' has already been used. Make sure none of the following names are duplicated: ${Join<GroupNames>}`,
+    IsCorrectType = Contains<TMsg, "">,
+    InstanceError = "❌ Only finalized expressions of type 'TypedRegExp' can be appended",
+    HasOverlap2 extends string | false = Overlaps<TNames, [...GroupNames, Name]>,
+    OverlapError2 = `❌ The name '${HasOverlap2}' has already been used. Make sure none of the following names are duplicated: ${Join<
+      [...GroupNames, Name]
+    >}`
+  >(
+    name: Name & Assert<HasOverlap1, false, OverlapError1> & Assert<ContainsValue, true, NameError>,
+    instance: Assert<IsCorrectType, true, InstanceError> &
+      TypedRegExp<State<TMsg, TExp, TPrevExp, [...TNames], [...TGroups]>> &
+      Assert<HasOverlap2, false, OverlapError2>
+  ) {
+    const newState = this.appendState(instance, true)
+    const group = `(\\k<${name}>${newState.curExpression})` as const
+    return new TypedRegExp({
+      ...newState,
+      curExpression: group,
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      groupNames: [...this.state.groupNames, name, ...instance["state"].groupNames] as [
+        ...GroupNames,
+        Name,
+        ...TNames
+      ],
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      groups: [...this.state.groups, group, ...instance["state"].groups] as [
+        ...Groups,
+        typeof group,
+        ...TGroups
+      ],
+    })
+  }
+
+  capture<
+    TMsg extends string,
+    TExp extends string,
+    TPrevExp extends string,
+    TNames extends string[],
+    TGroups extends string[],
+    IsCorrectType = Contains<TMsg, "">,
+    InstanceError = "❌ Only finalized expressions of type 'TypedRegExp' can be appended",
+    HasOverlap extends string | false = Overlaps<TNames, GroupNames>,
+    OverlapError = `❌ The name '${HasOverlap}' has already been used. Make sure none of the following names are duplicated: ${Join<GroupNames>}`
+  >(
+    instance: Assert<IsCorrectType, true, InstanceError> &
+      TypedRegExp<State<TMsg, TExp, TPrevExp, [...TNames], [...TGroups]>> &
+      Assert<HasOverlap, false, OverlapError>
+  ) {
+    const newState = this.appendState(instance, true)
+    const group = `(${newState.curExpression})` as const
+    return new TypedRegExp({
+      ...newState,
+      curExpression: group,
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      groups: [...this.state.groups, group, ...instance["state"].groups] as [
+        ...Groups,
+        typeof group,
+        ...TGroups
+      ],
+    })
+  }
+
   append<
     TMsg extends string,
     TExp extends string,
@@ -102,7 +198,7 @@ export class Input<
       TypedRegExp<State<TMsg, TExp, TPrevExp, [...TNames], [...TGroups]>> &
       Assert<HasOverlap, false, OverlapError>
   ) {
-    return new TypedRegExp(this.appendState(instance))
+    return new TypedRegExp(this.appendState(instance, false))
   }
 
   static create() {

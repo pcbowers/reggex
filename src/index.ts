@@ -40,10 +40,13 @@ Object.defineProperties(TypedRegExp.prototype, {
   groupedAsTest: { value: extendTypedRegEx().groupedAsTest },
 })
 
-const test = Input.create().anyChar.and.anyChar.thatRepeatsTest.groupedAs.namedCapture("asdf")
+const test =
+  Input.create().anyChar.groupedAs.captureGroup.and.anyChar.thatRepeatsTest.groupedAs.namedCapture(
+    "asdf"
+  )
 const test2 = Input.create()
-  .anyChar.groupedAs.namedCapture("adsdf")
-  .and.append(test)
-  .and.backreferenceTo("asdf")
+  .anyChar.groupedAs.namedCapture("hello")
+  .and.backreferenceTo("hello")
+  .and.append(test).and.anyChar
 
 console.log(test2)

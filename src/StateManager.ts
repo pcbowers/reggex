@@ -50,16 +50,36 @@ export class StateManager<
     TCurExpression extends string,
     TPrevExpression extends string,
     TGroupNames extends string[],
-    TGroups extends string[]
+    TGroups extends string[],
+    AppendToCurExpression extends boolean,
+    NewCurExpression extends string = AppendToCurExpression extends false
+      ? TCurExpression
+      : `${TPrevExpression}${TCurExpression}`,
+    NewPrevExpression extends string = AppendToCurExpression extends false
+      ? `${PrevExpression}${CurExpression}${TPrevExpression}`
+      : `${PrevExpression}${CurExpression}`
   >(
     instance: StateManager<
       State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
-    >
+    >,
+    appendToCurExpression: AppendToCurExpression
   ) {
+    const curExpression = (
+      appendToCurExpression
+        ? (`${instance.state.prevExpression}${instance.state.curExpression}` as const)
+        : instance.state.curExpression
+    ) as NewCurExpression
+
+    const prevExpression = (
+      appendToCurExpression
+        ? (`${this.state.prevExpression}${this.state.curExpression}` as const)
+        : (`${this.state.prevExpression}${this.state.curExpression}${instance.state.prevExpression}` as const)
+    ) as NewPrevExpression
+
     return this.merge({
-      curExpression: instance.state.curExpression,
+      curExpression,
+      prevExpression,
       message: instance.state.message,
-      prevExpression: `${this.state.prevExpression}${this.state.curExpression}${instance.state.prevExpression}`,
       groupNames: instance.state.groupNames,
       groups: instance.state.groups,
     })
