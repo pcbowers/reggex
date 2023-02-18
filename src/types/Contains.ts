@@ -1,4 +1,4 @@
-import { Add, Subtract } from "@types"
+import { Add, Subtract } from "./index"
 
 export type Contains<
   Str extends string,

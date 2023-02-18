@@ -1,7 +1,7 @@
-import { Assert, Join, OfLength, Overlaps, State } from "@types"
-import { DEFAULT_STATE } from "@utils"
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
+import { Assert, Join, OfLength, Overlaps, State } from "@types"
+import { DEFAULT_STATE } from "@utils"
 
 export class Group<
   TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,

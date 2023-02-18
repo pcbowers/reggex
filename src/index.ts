@@ -2,8 +2,8 @@ import { State } from "@types"
 import { Input } from "./Input"
 import { TypedRegExp } from "./TypedRegExp"
 
-declare module "./TypedRegExp" {
-  interface TypedRegExp<
+declare module "./Input" {
+  interface Input<
     TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,
     Message extends string = TState["message"],
     CurExpression extends string = TState["curExpression"],
@@ -11,8 +11,8 @@ declare module "./TypedRegExp" {
     GroupNames extends string[] = TState["groupNames"],
     Groups extends string[] = TState["groups"]
   > {
-    thatRepeatsTest: ReturnType<ReturnType<typeof extendTypedRegEx<TState>>["thatRepeatsTest"]>
-    groupedAsTest: ReturnType<typeof extendTypedRegEx<TState>>["groupedAsTest"]
+    gmailDomain: ReturnType<ReturnType<typeof extendTypedRegEx<TState>>["gmailDomain"]>
+    domain: ReturnType<typeof extendTypedRegEx<TState>>["domain"]
   }
 }
 
@@ -24,29 +24,30 @@ const extendTypedRegEx = <
   GroupNames extends string[] = TState["groupNames"],
   Groups extends string[] = TState["groups"]
 >() => ({
-  thatRepeatsTest: function (this: TypedRegExp<TState>) {
-    return new TypedRegExp(this.merge({ curExpression: `${this.state.curExpression}+` }))
-  },
-  groupedAsTest: function <Name extends string>(this: TypedRegExp<TState>, name: Name) {
-    const group = `(?<${name}>${this.state.curExpression})` as const
+  gmailDomain: function (this: Input<TState>) {
     return new TypedRegExp(
-      this.merge({ curExpression: group, groupNames: [name], groups: [group] })
+      this.merge({ curExpression: `${this.state.curExpression}\\bgmail.com\\b` })
+    )
+  },
+  domain: function <Domain extends string>(this: Input<TState>, domain: Domain) {
+    return new TypedRegExp(
+      this.merge({ curExpression: `${this.state.curExpression}\\b${domain}\\b` })
     )
   },
 })
 
-Object.defineProperties(TypedRegExp.prototype, {
-  thatRepeatsTest: { get: extendTypedRegEx().thatRepeatsTest },
-  groupedAsTest: { value: extendTypedRegEx().groupedAsTest },
+Object.defineProperties(Input.prototype, {
+  gmailDomain: { get: extendTypedRegEx().gmailDomain },
+  domain: { value: extendTypedRegEx().domain },
 })
 
-const test =
-  Input.create().anyChar.groupedAs.captureGroup.and.anyChar.thatRepeatsTest.groupedAs.namedCapture(
-    "asdf"
-  )
+const test = Input.create()
+  .anyChar.groupedAs.captureGroup.and.anyChar.and.domain("test.com")
+  .groupedAs.namedCapture("asdf")
+
 const test2 = Input.create()
   .anyChar.groupedAs.namedCapture("hello")
   .and.backreferenceTo("hello")
-  .and.append(test).and.anyChar
+  .and.gmailDomain.and.capture(test)
 
 console.log(test2)

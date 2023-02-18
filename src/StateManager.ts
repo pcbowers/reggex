@@ -45,40 +45,56 @@ export class StateManager<
     } as MergedState
   }
 
-  protected appendState<
+  protected appendStateToCurrent<
+    NewState extends State<
+      TMessage,
+      `${TPrevExpression}${TCurExpression}`,
+      `${PrevExpression}${CurExpression}`,
+      [...TGroupNames],
+      [...TGroups]
+    >,
+    MergedState extends StateMerger<TState, NewState>,
     TMessage extends string,
     TCurExpression extends string,
     TPrevExpression extends string,
     TGroupNames extends string[],
-    TGroups extends string[],
-    AppendToCurExpression extends boolean,
-    NewCurExpression extends string = AppendToCurExpression extends false
-      ? TCurExpression
-      : `${TPrevExpression}${TCurExpression}`,
-    NewPrevExpression extends string = AppendToCurExpression extends false
-      ? `${PrevExpression}${CurExpression}${TPrevExpression}`
-      : `${PrevExpression}${CurExpression}`
+    TGroups extends string[]
   >(
     instance: StateManager<
       State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
-    >,
-    appendToCurExpression: AppendToCurExpression
-  ) {
-    const curExpression = (
-      appendToCurExpression
-        ? (`${instance.state.prevExpression}${instance.state.curExpression}` as const)
-        : instance.state.curExpression
-    ) as NewCurExpression
-
-    const prevExpression = (
-      appendToCurExpression
-        ? (`${this.state.prevExpression}${this.state.curExpression}` as const)
-        : (`${this.state.prevExpression}${this.state.curExpression}${instance.state.prevExpression}` as const)
-    ) as NewPrevExpression
-
+    >
+  ): MergedState {
     return this.merge({
-      curExpression,
-      prevExpression,
+      curExpression: `${instance.state.prevExpression}${instance.state.curExpression}`,
+      prevExpression: `${this.state.prevExpression}${this.state.curExpression}`,
+      message: instance.state.message,
+      groupNames: instance.state.groupNames,
+      groups: instance.state.groups,
+    })
+  }
+
+  protected appendState<
+    NewState extends State<
+      TMessage,
+      TCurExpression,
+      `${PrevExpression}${CurExpression}${TPrevExpression}`,
+      [...TGroupNames],
+      [...TGroups]
+    >,
+    MergedState extends StateMerger<TState, NewState>,
+    TMessage extends string,
+    TCurExpression extends string,
+    TPrevExpression extends string,
+    TGroupNames extends string[],
+    TGroups extends string[]
+  >(
+    instance: StateManager<
+      State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
+    >
+  ): MergedState {
+    return this.merge({
+      curExpression: instance.state.curExpression,
+      prevExpression: `${this.state.prevExpression}${this.state.curExpression}${instance.state.prevExpression}`,
       message: instance.state.message,
       groupNames: instance.state.groupNames,
       groups: instance.state.groups,

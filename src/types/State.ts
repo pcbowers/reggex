@@ -1,4 +1,4 @@
-import { Add, Expand } from "@types"
+import { Expand, Length } from "./index"
 
 type FilterEmpty<T extends string[]> = T extends [infer F, ...infer R]
   ? F extends string
@@ -46,10 +46,13 @@ export type StateMerger<CurState extends State, NewState extends State> = Expand
     : []
 }>
 
-export type GroupIndices<GroupNames extends string[], Groups extends string[]> =
-  | GroupNames[number]
-  | (Extract<keyof Groups, `${number}`> extends `${infer N extends number}`
-      ? N extends number
-        ? Add<N, 1>
-        : never
-      : never)
+export type TupleIndices<T extends string[]> = T extends [any, ...infer Rest]
+  ? Rest extends string[]
+    ? [...TupleIndices<Rest>, Length<Rest>]
+    : [0]
+  : []
+
+export type GroupIndices<GroupNames extends string[], Groups extends string[]> = [
+  ...GroupNames,
+  ...TupleIndices<Groups>
+]

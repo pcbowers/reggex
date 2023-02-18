@@ -9,14 +9,10 @@ export class Quantifier<
   CurExpression extends string = TState["curExpression"],
   PrevExpression extends string = TState["prevExpression"],
   GroupNames extends string[] = TState["groupNames"],
-  Groups extends string[] = TState["groups"]
+  Groups extends string[] = TState["groups"],
+  IsLazy extends string = Contains<Message, "lazy"> extends true ? "?" : ""
 > extends StateManager<TState> {
-  private isLazy = (this.state.message.includes("lazy") ? "?" : "") as Contains<
-    Message,
-    "lazy"
-  > extends true
-    ? "?"
-    : ""
+  private isLazy = (this.state.message.includes("lazy") ? "?" : "") as IsLazy
 
   get zeroOrMore() {
     return new TypedRegExp(

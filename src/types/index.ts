@@ -1,7 +1,7 @@
 export type { Add, Length, Subtract } from "./arithmetic"
 export type { Assert } from "./Assert"
 export type { Contains } from "./Contains"
-export type { Join, JoinUnion } from "./Join"
+export type { Join } from "./Join"
 export type { OfLength } from "./OfLength"
 export type { Overlaps } from "./Overlaps"
 export type { State, StateMerger, GroupIndices } from "./State"
