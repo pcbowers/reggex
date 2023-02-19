@@ -1,5 +1,6 @@
 import { Primitive, State } from "@types"
-import { Input } from "./Input"
+import { beforeAll, describe, expect, it } from "vitest"
+import { Input, match } from "./Input"
 import { TypedRegExp } from "./TypedRegExp"
 
 declare module "./Input" {
@@ -32,20 +33,20 @@ const extendTypedRegEx = <
   },
 })
 
-Object.defineProperties(Input.prototype, {
-  gmailDomain: { get: extendTypedRegEx().gmailDomain },
-  domain: { value: extendTypedRegEx().domain },
+describe("index", () => {
+  beforeAll(() => {
+    Object.defineProperties(Input.prototype, {
+      gmailDomain: { get: extendTypedRegEx().gmailDomain },
+      domain: { value: extendTypedRegEx().domain },
+    })
+  })
+  it("should allow get extension", () => {
+    const test = match.gmailDomain
+    expect(test["state"].curExp).toEqual("\\bgmail.com\\b")
+  })
+
+  it("should allow value extension", () => {
+    const test = match.domain("test.com")
+    expect(test["state"].curExp).toEqual("\\btest.com\\b")
+  })
 })
-
-const test = Input.create()
-  .anyChar.groupedAs.namedCapture("a$123")
-  .and.anyChar.and.domain("test.com")
-  .groupedAs.namedCapture("bro")
-
-const test2 = Input.create()
-  .anyChar.groupedAs.namedCapture("hello")
-  .and.backreferenceTo("hello")
-  .groupedAs.namedCapture("asdf")
-  .and.gmailDomain.and.group(test)
-
-console.log(test2)

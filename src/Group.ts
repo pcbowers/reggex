@@ -1,7 +1,6 @@
+import { Assert, Join, Letter, NoOverlap, OfLength, Primitive, StartsWith, State } from "@types"
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
-import { Assert, Join, OfLength, NoOverlap, State, Primitive, Letter, StartsWith } from "@types"
-import { DEFAULT_STATE } from "@utils"
 
 export class Group<
   CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
@@ -20,7 +19,7 @@ export class Group<
     return new TypedRegExp(this.merge({ curExp: group, groups: [...this.state.groups, group] }))
   }
 
-  namedCaptureGroup<
+  namedCaptureGroup = <
     Name extends string,
     IsNotEmpty = OfLength<Name, number>,
     EmptyErr = `❌ The Name '${Name}' must be a non-empty string`,
@@ -33,7 +32,7 @@ export class Group<
       Assert<IsNotEmpty, EmptyErr> &
       Assert<NameStartsWithLetter, NameDoesNotStartWithLetterErr> &
       Assert<HasNoOverlap, OverlapErr>
-  ) {
+  ) => {
     const group = `(?<${name}>${this.state.curExp})` as const
     return new TypedRegExp(
       this.merge({
@@ -45,8 +44,4 @@ export class Group<
   }
 
   namedCapture = this.namedCaptureGroup.bind(this)
-
-  static create() {
-    return new Group(DEFAULT_STATE)
-  }
 }

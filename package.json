@@ -14,34 +14,22 @@
   "keywords": [
     "regular",
     "expressions",
-    "expressive",
-    "method",
-    "chaining",
-    "fluent",
-    "builder",
-    "pattern",
     "javascript",
     "typescript",
     "typed"
   ],
   "type": "module",
-  "module": "./dist/regexp-ts.js",
-  "main": "./dist/regexp-ts.umd.cjs",
+  "module": "./dist/index.mjs",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/regexp-ts.js",
-      "require": "./dist/regexp-ts.umd.cjs"
-    }
-  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "vitest",
     "test": "vitest",
+    "build": "tsup src/index.ts --format cjs,esm,iife --dts --minify --sourcemap",
+    "preview": "vite preview",
     "coverage": "vitest run --coverage",
     "lint": "prettier --check . && eslint --ignore-path .gitignore . && tsc --noEmit"
   },
@@ -53,9 +41,11 @@
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "prettier": "2.8.3",
+    "tsup": "^6.6.3",
     "typescript": "^4.9.5",
-    "vite": "^4.0.0",
-    "vite-plugin-dts": "^2.0.0-beta.1",
     "vitest": "^0.28.1"
+  },
+  "dependencies": {
+    "zod": "^3.20.6"
   }
 }

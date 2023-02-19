@@ -1,5 +1,4 @@
 import { Contains, Primitive, State } from "@types"
-import { DEFAULT_STATE } from "@utils"
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
 
@@ -20,9 +19,5 @@ export class Quantifier<
 
   get oneOrMore() {
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}+${this.isLazy}` }))
-  }
-
-  static create() {
-    return new Quantifier(DEFAULT_STATE)
   }
 }

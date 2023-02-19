@@ -1,34 +1,49 @@
+import { state } from "@utils"
 import { describe, expect, it } from "vitest"
-import { Input } from "./Input"
-import { Quantifier } from "./Quantifier"
+import { match } from "./Input"
 
-describe("Quantifier", () => {
-  it("creates", () => {
-    const test = Quantifier.create().oneOrMore
-    expect(test["state"].curExp).toEqual("+")
-  })
-
+const tests = (name: "thatRepeats" | "thatOccurs") => {
   describe("oneOrMore", () => {
+    it("resolves", () => {
+      const test = match.anyChar[name].oneOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".+" }))
+    })
+
     it("greedily resolves", () => {
-      const test = Input.create().anyChar.thatRepeats.oneOrMore
-      expect(test["state"].curExp).toEqual(".+")
+      const test = match.anyChar[name].greedily.oneOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".+" }))
     })
 
     it("lazily resolves", () => {
-      const test = Input.create().anyChar.thatRepeats.lazily.oneOrMore
-      expect(test["state"].curExp).toEqual(".+?")
+      const test = match.anyChar.thatRepeats.lazily.oneOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".+?" }))
     })
   })
 
   describe("zeroOrMore", () => {
+    it("resolves", () => {
+      const test = match.anyChar[name].zeroOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".*" }))
+    })
+
     it("greedily resolves", () => {
-      const test = Input.create().anyChar.thatRepeats.zeroOrMore
-      expect(test["state"].curExp).toEqual(".*")
+      const test = match.anyChar[name].greedily.zeroOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".*" }))
     })
 
     it("lazily resolves", () => {
-      const test = Input.create().anyChar.thatRepeats.lazily.zeroOrMore
-      expect(test["state"].curExp).toEqual(".*?")
+      const test = match.anyChar[name].lazily.zeroOrMore
+      expect(test["state"]).toMatchObject(state({ curExp: ".*?" }))
     })
+  })
+}
+
+describe("Quantifier", () => {
+  describe("thatOccurs", () => {
+    tests("thatOccurs")
+  })
+
+  describe("thatRepeats", () => {
+    tests("thatRepeats")
   })
 })

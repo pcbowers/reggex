@@ -5,13 +5,13 @@ import {
   HexChar,
   Join,
   Letter,
-  OfLength,
   NoOverlap,
+  OfLength,
   Primitive,
-  State,
   StartsWith,
+  State,
 } from "@types"
-import { DEFAULT_STATE } from "@utils"
+import { DEFAULT_STATE, state } from "@utils"
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
 
@@ -31,38 +31,44 @@ export class Input<
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\w` }))
   }
 
-  backreferenceTo<
+  backreferenceTo = <
     PossibleRefs extends (string | number)[] = GroupReferences<Names, Groups>,
     Ref extends string | number = PossibleRefs[number],
     IsValidRef = Ref extends PossibleRefs[number] ? true : false,
     InvalidRefErr = `❌ The Reference '${Ref}' is not a valid backreference. Possible values include: ${Join<PossibleRefs>}`,
     RefType extends string = Ref extends string ? `\\k<${Ref}>` : `\\${Ref}`
-  >(ref: Assert<IsValidRef, InvalidRefErr> & Ref) {
+  >(
+    ref: Assert<IsValidRef, InvalidRefErr> & Ref
+  ) => {
     const refType = (typeof ref === "string" ? `\\k<${ref}>` : `\\${ref}`) as RefType
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${refType}` }))
   }
 
-  controlChar<
+  controlChar = <
     ControlChar extends string,
     IsLetter = OfLength<ControlChar, 1, Letter>,
     NotLetterErr = `❌ The control character '${ControlChar}' must be a single letter from A-Z`
-  >(controlChar: ControlChar & Assert<IsLetter, NotLetterErr>) {
+  >(
+    controlChar: ControlChar & Assert<IsLetter, NotLetterErr>
+  ) => {
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\c${controlChar}` }))
   }
 
-  hexCode<
+  hexCode = <
     HexCode extends string,
     IsHexChar = OfLength<HexCode, number, HexChar>,
     HexCharErr = `❌ The HexCode '${HexCode}' must only contain valid hexidecimal digits`,
     IsProperLength = OfLength<HexCode, 2 | 4>,
     ImproperLengthErr = `❌ The HexCode '${HexCode}' must be a length of 2 or 4`,
     CharType extends string = OfLength<HexCode, 2> extends true ? "\\x" : "\\u"
-  >(hexChars: HexCode & Assert<IsHexChar, HexCharErr> & Assert<IsProperLength, ImproperLengthErr>) {
+  >(
+    hexChars: HexCode & Assert<IsHexChar, HexCharErr> & Assert<IsProperLength, ImproperLengthErr>
+  ) => {
     const charType = (hexChars.length === 2 ? "\\x" : "\\u") as CharType
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${charType}${hexChars}` }))
   }
 
-  unicodeChar<
+  unicodeChar = <
     UnicodeChar extends string,
     IsHexChar = OfLength<UnicodeChar, number, HexChar>,
     HexCharErr = `❌ The UnicodeChar '${UnicodeChar}' must only contain valid hexidecimal digits`,
@@ -72,11 +78,11 @@ export class Input<
     unicodeChar: UnicodeChar &
       Assert<IsHexChar, HexCharErr> &
       Assert<IsProperLength, ImproperLengthErr>
-  ) {
+  ) => {
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
   }
 
-  group<
+  group = <
     TMsg extends Primitive,
     TCurExp extends string,
     TPrvExp extends string,
@@ -90,7 +96,7 @@ export class Input<
     instance: Assert<IsValidType, InvalidTypeErr> &
       TypedRegExp<State<TMsg, TCurExp, TPrvExp, TNames, TGroups>> &
       Assert<HasNoOverlap, OverlapErr>
-  ) {
+  ) => {
     const newState = this.extractState(instance)
     return new TypedRegExp(
       this.merge({
@@ -103,7 +109,7 @@ export class Input<
     )
   }
 
-  capture<
+  capture = <
     TMsg extends Primitive,
     TCurExp extends string,
     TPrvExp extends string,
@@ -117,7 +123,7 @@ export class Input<
     instance: Assert<IsValidType, InvalidTypeErr> &
       TypedRegExp<State<TMsg, TCurExp, TPrvExp, TNames, TGroups>> &
       Assert<HasNoOverlap, OverlapErr>
-  ) {
+  ) => {
     const newState = this.extractState(instance)
     const group = `(${newState.prvExp}${newState.curExp})` as const
     return new TypedRegExp(
@@ -131,7 +137,7 @@ export class Input<
     )
   }
 
-  namedCapture<
+  namedCapture = <
     TMsg extends Primitive,
     TCurExp extends string,
     TPrvExp extends string,
@@ -158,9 +164,9 @@ export class Input<
     instance: Assert<IsValidType, ValidTypeError> &
       TypedRegExp<State<TMsg, TCurExp, TPrvExp, TNames, TGroups>> &
       Assert<InstanceHasNoOverlap, InstanceOverlapErr>
-  ) {
+  ) => {
     const newState = this.extractState(instance)
-    const group = `(\\k<${name}>${newState.prvExp}${newState.curExp})` as const
+    const group = `(?<${name}>${newState.prvExp}${newState.curExp})` as const
     return new TypedRegExp(
       this.merge({
         msg: newState.msg,
@@ -172,7 +178,7 @@ export class Input<
     )
   }
 
-  append<
+  append = <
     TMsg extends Primitive,
     TCurExp extends string,
     TPrvExp extends string,
@@ -186,7 +192,7 @@ export class Input<
     instance: Assert<IsValidType, InvalidTypeErr> &
       TypedRegExp<State<TMsg, TCurExp, TPrvExp, TNames, TGroups>> &
       Assert<HasNoOverlap, OverlapErr>
-  ) {
+  ) => {
     const newState = this.extractState(instance)
     return new TypedRegExp(
       this.merge({
@@ -200,6 +206,16 @@ export class Input<
   }
 
   static create() {
-    return new Input(DEFAULT_STATE)
+    return new Input(state({ msg: "⏳ Select Input..." }))
   }
 }
+
+export const anyChar = Input.create().anyChar
+export const capture = Input.create().capture
+export const controlChar = Input.create().controlChar
+export const group = Input.create().group
+export const hexCode = Input.create().hexCode
+export const namedCapture = Input.create().namedCapture
+export const unicodeChar = Input.create().unicodeChar
+export const wordChar = Input.create().wordChar
+export const match = Input.create()

@@ -16,8 +16,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@types": ["./src/types/index.ts"],
-      "@utils": ["./src/utils/index.ts"]
+      "@types": ["./src/types/index"],
+      "@utils": ["./src/utils/index"]
     }
   },
   "include": ["src"]

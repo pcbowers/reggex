@@ -1,5 +1,4 @@
 import { Primitive, State } from "@types"
-import { DEFAULT_STATE } from "@utils"
 import { Group } from "./Group"
 import { Input } from "./Input"
 import { Quantifier } from "./Quantifier"
@@ -47,9 +46,5 @@ export class TypedRegExp<
         })
       )
     )
-  }
-
-  static create() {
-    return new TypedRegExp(DEFAULT_STATE)
   }
 }
