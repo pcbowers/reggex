@@ -1,37 +1,46 @@
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
-import { Assert, Join, OfLength, Overlaps, State } from "@types"
+import { Assert, Join, OfLength, NoOverlap, State, Primitive, Letter, StartsWith } from "@types"
 import { DEFAULT_STATE } from "@utils"
 
 export class Group<
-  TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,
-  Message extends string = TState["message"],
-  CurExpression extends string = TState["curExpression"],
-  PrevExpression extends string = TState["prevExpression"],
-  GroupNames extends string[] = TState["groupNames"],
-  Groups extends string[] = TState["groups"]
-> extends StateManager<TState> {
+  CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
+  Msg extends Primitive = CurState["msg"],
+  CurExp extends string = CurState["curExp"],
+  PrvExp extends string = CurState["prvExp"],
+  Names extends string[] = CurState["names"],
+  Groups extends string[] = CurState["groups"]
+> extends StateManager<CurState> {
   get nonCaptureGroup() {
-    return new TypedRegExp(
-      this.merge({ message: "", curExpression: `(?:${this.state.curExpression})` })
-    )
+    return new TypedRegExp(this.merge({ curExp: `(?:${this.state.curExp})` }))
   }
 
   get captureGroup() {
-    const group = `(${this.state.curExpression})` as const
-    return new TypedRegExp(this.merge({ message: "", curExpression: group, groups: [group] }))
+    const group = `(${this.state.curExp})` as const
+    return new TypedRegExp(this.merge({ curExp: group, groups: [...this.state.groups, group] }))
   }
 
   namedCaptureGroup<
     Name extends string,
-    ContainsValue = OfLength<Name, number>,
-    NameError = `❌ The Name '${Name}' must be a non-empty string`,
-    HasOverlap extends string | false = Overlaps<[Name], GroupNames>,
-    OverlapError = `❌ The Name '${HasOverlap}' has already been used. Make sure none of the following names are duplicated: ${Join<GroupNames>}`
-  >(name: Name & Assert<HasOverlap, false, OverlapError> & Assert<ContainsValue, true, NameError>) {
-    const group = `(?<${name}>${this.state.curExpression})` as const
+    IsNotEmpty = OfLength<Name, number>,
+    EmptyErr = `❌ The Name '${Name}' must be a non-empty string`,
+    NameStartsWithLetter = StartsWith<Name, Letter>,
+    NameDoesNotStartWithLetterErr = `❌ The Name '${Name}' must start with a string`,
+    HasNoOverlap = NoOverlap<[Name], Names>,
+    OverlapErr = `❌ The Name '$' has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
+  >(
+    name: Name &
+      Assert<IsNotEmpty, EmptyErr> &
+      Assert<NameStartsWithLetter, NameDoesNotStartWithLetterErr> &
+      Assert<HasNoOverlap, OverlapErr>
+  ) {
+    const group = `(?<${name}>${this.state.curExp})` as const
     return new TypedRegExp(
-      this.merge({ message: "", curExpression: group, groupNames: [name], groups: [group] })
+      this.merge({
+        curExp: group,
+        names: [...this.state.names, name],
+        groups: [...this.state.groups, group],
+      })
     )
   }
 

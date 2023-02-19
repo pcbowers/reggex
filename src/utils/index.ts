@@ -1,9 +1,9 @@
-import { State } from "@types"
+import { Expand, State } from "@types"
 
-export const DEFAULT_STATE = {
-  message: "" as const,
-  curExpression: "" as const,
-  prevExpression: "" as const,
-  groupNames: [] as [],
-  groups: [] as [],
-} satisfies State
+export const DEFAULT_STATE: Expand<State<"⚡ Ready for RegExp conversion!", "", "", [], []>> = {
+  msg: "⚡ Ready for RegExp conversion!",
+  curExp: "",
+  prvExp: "",
+  names: [],
+  groups: [],
+}

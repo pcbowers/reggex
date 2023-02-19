@@ -1,29 +1,25 @@
-import { Contains, State } from "@types"
+import { Contains, Primitive, State } from "@types"
 import { DEFAULT_STATE } from "@utils"
 import { StateManager } from "./StateManager"
 import { TypedRegExp } from "./TypedRegExp"
 
 export class Quantifier<
-  TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,
-  Message extends string = TState["message"],
-  CurExpression extends string = TState["curExpression"],
-  PrevExpression extends string = TState["prevExpression"],
-  GroupNames extends string[] = TState["groupNames"],
-  Groups extends string[] = TState["groups"],
-  IsLazy extends string = Contains<Message, "lazy"> extends true ? "?" : ""
-> extends StateManager<TState> {
-  private isLazy = (this.state.message.includes("lazy") ? "?" : "") as IsLazy
+  CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
+  Msg extends Primitive = CurState["msg"],
+  CurExp extends string = CurState["curExp"],
+  PrvExp extends string = CurState["prvExp"],
+  Names extends string[] = CurState["names"],
+  Groups extends string[] = CurState["groups"],
+  IsLazy extends string = Contains<Msg, "lazy"> extends true ? "?" : ""
+> extends StateManager<CurState> {
+  private isLazy = (String(this.state.msg).includes("lazy") ? "?" : "") as IsLazy
 
   get zeroOrMore() {
-    return new TypedRegExp(
-      this.merge({ message: "", curExpression: `${this.state.curExpression}*${this.isLazy}` })
-    )
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}*${this.isLazy}` }))
   }
 
   get oneOrMore() {
-    return new TypedRegExp(
-      this.merge({ message: "", curExpression: `${this.state.curExpression}+${this.isLazy}` })
-    )
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}+${this.isLazy}` }))
   }
 
   static create() {

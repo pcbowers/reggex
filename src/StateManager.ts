@@ -1,114 +1,59 @@
-import { State, StateMerger } from "@types"
+import { State, StateMerger, Primitive, GroupReferences } from "@types"
 import { DEFAULT_STATE } from "@utils"
 
-export class StateManager<
-  TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,
-  Message extends string = TState["message"],
-  CurExpression extends string = TState["curExpression"],
-  PrevExpression extends string = TState["prevExpression"],
-  GroupNames extends string[] = TState["groupNames"],
-  Groups extends string[] = TState["groups"]
+export abstract class StateManager<
+  CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
+  Msg extends Primitive = CurState["msg"],
+  CurExp extends string = CurState["curExp"],
+  PrvExp extends string = CurState["prvExp"],
+  Names extends string[] = CurState["names"],
+  Groups extends string[] = CurState["groups"]
 > {
-  constructor(protected state: TState) {}
+  constructor(protected state: CurState) {}
 
   protected merge<
-    NewState extends State<
-      TMessage,
-      TCurExpression,
-      TPrevExpression,
-      [...TGroupNames],
-      [...TGroups]
-    >,
-    MergedState extends StateMerger<TState, NewState>,
-    TMessage extends string = never,
-    TCurExpression extends string = never,
-    TPrevExpression extends string = never,
-    TGroupNames extends string[] = never,
-    TGroups extends string[] = never
-  >(
-    newState: Partial<
-      State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
-    >
-  ): MergedState {
+    NewState extends State<NewMsg, NewCurExp, NewPrvExp, NewNames, NewGroups>,
+    MergedState extends StateMerger<CurState, NewState>,
+    NewMsg extends Primitive = never,
+    NewCurExp extends string = never,
+    NewPrvExp extends string = never,
+    NewNames extends string[] = never,
+    NewGroups extends string[] = never
+  >(newState: Partial<State<NewMsg, NewCurExp, NewPrvExp, NewNames, NewGroups>>): MergedState {
     return {
-      curExpression: newState.curExpression ?? this.state.curExpression,
-      message: newState.message ?? this.state.message,
-      prevExpression: newState.prevExpression ?? this.state.prevExpression,
-      groupNames: [
-        ...this.state.groupNames.filter((str) => str !== ""),
-        ...(newState.groupNames ?? []).filter((str) => str !== ""),
-      ],
-      groups: [
-        ...this.state.groups.filter((str) => str !== ""),
-        ...(newState.groups ?? []).filter((str) => str !== ""),
-      ],
+      curExp: newState.curExp ?? this.state.curExp,
+      msg: newState.msg ?? DEFAULT_STATE.msg,
+      prvExp: newState.prvExp ?? this.state.prvExp,
+      names: [...(newState.names ?? this.state.names)],
+      groups: [...(newState.groups ?? this.state.groups)],
     } as MergedState
   }
 
-  protected appendStateToCurrent<
-    NewState extends State<
-      TMessage,
-      `${TPrevExpression}${TCurExpression}`,
-      `${PrevExpression}${CurExpression}`,
-      [...TGroupNames],
-      [...TGroups]
-    >,
-    MergedState extends StateMerger<TState, NewState>,
-    TMessage extends string,
-    TCurExpression extends string,
-    TPrevExpression extends string,
-    TGroupNames extends string[],
+  protected extractState<
+    InstanceState extends State<TMsg, TCurExp, TPrvExp, TNames, TGroups>,
+    TMsg extends Primitive,
+    TCurExp extends string,
+    TPrvExp extends string,
+    TNames extends string[],
     TGroups extends string[]
-  >(
-    instance: StateManager<
-      State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
+  >(instance: StateManager<InstanceState>): InstanceState {
+    return {
+      msg: instance.state.msg,
+      curExp: instance.state.curExp,
+      prvExp: instance.state.prvExp,
+      names: [...instance.state.names],
+      groups: [...instance.state.groups],
+    } as InstanceState
+  }
+
+  protected get validRefs(): GroupReferences<Names, Groups> {
+    return [...this.state.names, ...Object.keys(this.state.groups)] as GroupReferences<
+      Names,
+      Groups
     >
-  ): MergedState {
-    return this.merge({
-      curExpression: `${instance.state.prevExpression}${instance.state.curExpression}`,
-      prevExpression: `${this.state.prevExpression}${this.state.curExpression}`,
-      message: instance.state.message,
-      groupNames: instance.state.groupNames,
-      groups: instance.state.groups,
-    })
   }
 
-  protected appendState<
-    NewState extends State<
-      TMessage,
-      TCurExpression,
-      `${PrevExpression}${CurExpression}${TPrevExpression}`,
-      [...TGroupNames],
-      [...TGroups]
-    >,
-    MergedState extends StateMerger<TState, NewState>,
-    TMessage extends string,
-    TCurExpression extends string,
-    TPrevExpression extends string,
-    TGroupNames extends string[],
-    TGroups extends string[]
-  >(
-    instance: StateManager<
-      State<TMessage, TCurExpression, TPrevExpression, [...TGroupNames], [...TGroups]>
-    >
-  ): MergedState {
-    return this.merge({
-      curExpression: instance.state.curExpression,
-      prevExpression: `${this.state.prevExpression}${this.state.curExpression}${instance.state.prevExpression}`,
-      message: instance.state.message,
-      groupNames: instance.state.groupNames,
-      groups: instance.state.groups,
-    })
-  }
-
-  protected beginNewExp() {
-    return this.merge({
-      curExpression: "",
-      prevExpression: `${this.state.prevExpression}${this.state.curExpression}`,
-    })
-  }
-
-  static create() {
-    return new StateManager(DEFAULT_STATE)
+  protected isValidRef(ref: string | number): ref is GroupReferences<Names, Groups>[number] {
+    return !this.state.names.includes(ref as string) && !this.state.groups[ref as number]
   }
 }

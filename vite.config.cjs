@@ -2,7 +2,7 @@
 
 import { resolve } from "path"
 import { defineConfig } from "vite"
-import tsconfigPaths from "vite-tsconfig-paths"
+import dts from "vite-plugin-dts"
 
 export default defineConfig({
   test: {
@@ -20,5 +20,11 @@ export default defineConfig({
       fileName: "regexp-ts",
     },
   },
-  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      "@types": resolve(__dirname, "src/types/index"),
+      "@utils": resolve(__dirname, "src/utils/index"),
+    },
+  },
+  plugins: [dts()],
 })

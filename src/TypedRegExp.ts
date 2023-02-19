@@ -1,4 +1,4 @@
-import { State } from "@types"
+import { Primitive, State } from "@types"
 import { DEFAULT_STATE } from "@utils"
 import { Group } from "./Group"
 import { Input } from "./Input"
@@ -6,26 +6,23 @@ import { Quantifier } from "./Quantifier"
 import { StateManager } from "./StateManager"
 
 export class TypedRegExp<
-  TState extends State<Message, CurExpression, PrevExpression, GroupNames, Groups>,
-  Message extends string = TState["message"],
-  CurExpression extends string = TState["curExpression"],
-  PrevExpression extends string = TState["prevExpression"],
-  GroupNames extends string[] = TState["groupNames"],
-  Groups extends string[] = TState["groups"]
-> extends StateManager<TState> {
+  CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
+  Msg extends Primitive = CurState["msg"],
+  CurExp extends string = CurState["curExp"],
+  PrvExp extends string = CurState["prvExp"],
+  Names extends string[] = CurState["names"],
+  Groups extends string[] = CurState["groups"]
+> extends StateManager<CurState> {
   get thatOccurs() {
     const that = this
-    return Object.assign(
-      new Quantifier(this.merge({ message: "⏳️ Waiting for greedy quantifier..." })),
-      {
-        get lazily() {
-          return new Quantifier(that.merge({ message: "⏳️ Waiting for lazy quantifier..." }))
-        },
-        get greedily() {
-          return new Quantifier(that.merge({ message: "⏳️ Waiting for greedy quantifier..." }))
-        },
-      }
-    )
+    return Object.assign(new Quantifier(this.merge({ msg: "⏳️ Select greedy Quantifier..." })), {
+      get lazily() {
+        return new Quantifier(that.merge({ msg: "⏳️ Select lazy Quantifier..." }))
+      },
+      get greedily() {
+        return new Quantifier(that.merge({ msg: "⏳️ Select greedy Quantifier..." }))
+      },
+    })
   }
 
   get thatRepeats() {
@@ -33,7 +30,7 @@ export class TypedRegExp<
   }
 
   get groupedAs() {
-    return new Group(this.merge({ message: "⏳️ Waiting for group type..." }))
+    return new Group(this.merge({ msg: "⏳️ Select Group..." }))
   }
 
   get as() {
@@ -41,7 +38,15 @@ export class TypedRegExp<
   }
 
   get and() {
-    return new Input(this.beginNewExp())
+    return new Input(
+      this.merge(
+        this.merge({
+          msg: "⏳ Select Input...",
+          curExp: "",
+          prvExp: `${this.state.prvExp}${this.state.curExp}`,
+        })
+      )
+    )
   }
 
   static create() {
