@@ -1,4 +1,4 @@
-# regexp-ts
+# reggex
 
 A TypeScript library that provides a programmatic and human-readable API to create strongly-typed regular expressions.
 
