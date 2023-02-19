@@ -8,11 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+lib
 dist
 dist-ssr
 *.local
-coverage
+coverage/*
 junit.xml
+package-lock.json
 
 # Editor directories and files
 .npmrc

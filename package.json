@@ -18,18 +18,38 @@
     "typescript",
     "typed"
   ],
-  "type": "module",
-  "module": "./dist/index.mjs",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "treeshake": true,
+    "sourcemap": true,
+    "minify": true,
+    "clean": true,
+    "dts": true,
+    "outDir": "lib",
+    "format": [
+      "cjs",
+      "esm"
+    ]
+  },
+  "module": "./lib/index.js",
+  "main": "./lib/index.cjs",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.js"
+    }
+  },
   "files": [
-    "dist"
+    "lib"
   ],
+  "type": "module",
   "scripts": {
     "dev": "vitest",
-    "test": "vitest",
-    "build": "tsup src/index.ts --format cjs,esm,iife --dts --minify --sourcemap",
-    "preview": "vite preview",
+    "test": "vitest run",
+    "build": "tsup",
     "coverage": "vitest run --coverage",
     "lint": "prettier --check . && eslint --ignore-path .gitignore . && tsc --noEmit"
   },

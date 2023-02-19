@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: regexp-ts
-          path: dist/**/*
+          path: lib/**/*
         if: success() || failure()
 
       - name: Test Summary
