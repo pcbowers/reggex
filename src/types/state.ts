@@ -35,6 +35,11 @@ type MergePrimitive<T, S> = [S] extends [never]
 
 /**
  * The State of a TypedRegExp
+ * @param Msg The message to use to help indicate the user what is going on
+ * @param CurExp The current expression
+ * @param PrvExp The previous expression
+ * @param Names The names of the groups
+ * @param Groups The groups
  */
 export interface State<
   Msg extends Primitive = Primitive,
@@ -50,6 +55,14 @@ export interface State<
   groups: [...Groups]
 }
 
+/**
+ * A helper type to infer the state of a TypedRegExp
+ * @param Msg The message to use to help indicate the user what is going on
+ * @param CurExp The current expression
+ * @param PrvExp The previous expression
+ * @param Names The names of the groups
+ * @param Groups The groups
+ */
 export interface InferState<
   TState extends State<Msg, CurExp, PrvExp, Names, Groups>,
   Msg extends Primitive = TState["msg"],
@@ -63,6 +76,19 @@ export interface InferState<
   prvExp: PrvExp
   names: [...Names]
   groups: [...Groups]
+}
+
+/**
+ * The options for an Appender
+ * @param Namespace The namespace to use for the appender
+ * @param AsPrefix Whether or not to use the namespace as a prefix or a suffix
+ */
+export interface AppenderOpts<
+  Namespace extends string = string,
+  AsPrefix extends boolean = boolean
+> {
+  namespace: Namespace
+  asPrefix: AsPrefix
 }
 
 /**
