@@ -26,13 +26,15 @@ jobs:
         run: npm run build
 
       - name: Version Package
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          npm version ${{ github.event.release.tag_name }} -m 'chore(release): :bookmark: Updated Package Version to ${{ github.event.release.tag_name }} [skip-ci]'
-          git push origin HEAD:main
+        run: npm version ${{ github.event.release.tag_name }} -m 'chore(release): :bookmark: Updated Package Version to ${{ github.event.release.tag_name }} [skip-ci]'
 
       - name: Publish Package
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push Version
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git push origin HEAD:main
