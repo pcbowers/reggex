@@ -17,4 +17,18 @@ export class BaseRegExp<CurState extends State> {
       groups: [...this.state.groups],
     }
   }
+
+  static extend<Return, ExtenderFunction extends (...args: any[]) => Return>(
+    value: ExtenderFunction,
+    options: {
+      name: string
+      type?: "getMethod" | "method" | "value"
+    }
+  ) {
+    Object.defineProperty(this.prototype, options.name, {
+      [options.type === "getMethod" ? "get" : "value"]: value(),
+    })
+
+    return value
+  }
 }

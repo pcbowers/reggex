@@ -1,4 +1,4 @@
-import { Expand, Primitive } from "@types"
+import { Primitive } from "@types"
 
 /**
  * Join an array of primitives into a string
@@ -53,9 +53,5 @@ export type Join<Tuple, Delimiter extends string = " | "> = Tuple extends [
  * @returns The intersection of T and U
  */
 export type TupleToIntersection<T, U extends any[]> = U extends [infer First, ...infer Rest]
-  ? T extends (...args: any[]) => any
-    ? T & Expand<TupleToIntersection<First, Rest>>
-    : T extends Record<any, any>
-    ? Expand<T & TupleToIntersection<First, Rest>>
-    : T & Expand<TupleToIntersection<First, Rest>>
+  ? T & TupleToIntersection<First, Rest>
   : T

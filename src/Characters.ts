@@ -67,6 +67,7 @@ export class Characters<CurState extends State> extends BaseRegExp<CurState> {
   }
 
   static create() {
-    return new Characters(createState({ msg: "⏳ Select Input..." }))
+    const state = createState({ curExp: "" })
+    return new Characters(state)
   }
 }

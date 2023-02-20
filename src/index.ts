@@ -5,6 +5,7 @@ export * from "@types"
 export * from "@utils"
 export * from "./Groups"
 export * from "./Appenders"
+export * from "./Characters"
 export * from "./Quantifiers"
 export * from "./TypedRegExp"
 

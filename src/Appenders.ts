@@ -7,14 +7,14 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
   group = <
     TState extends State,
     IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions of type 'TypedRegExp' can be appended`,
+    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
     HasNoOverlap = NoOverlap<TState["names"], CurState["names"]>,
     OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
       CurState["names"]
     >}`
   >(
     instance: Assert<IsValidType, InvalidTypeErr> &
-      TypedRegExp<TState> &
+      BaseRegExp<TState> &
       Assert<HasNoOverlap, OverlapErr>
   ) => {
     const newState = instance.getState()
@@ -32,14 +32,14 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
   capture = <
     TState extends State,
     IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions of type 'TypedRegExp' can be appended`,
+    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
     HasNoOverlap = NoOverlap<TState["names"], CurState["names"]>,
     OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
       CurState["names"]
     >}`
   >(
     instance: Assert<IsValidType, InvalidTypeErr> &
-      TypedRegExp<TState> &
+      BaseRegExp<TState> &
       Assert<HasNoOverlap, OverlapErr>
   ) => {
     const newState = instance.getState()
@@ -67,7 +67,7 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
       CurState["names"]
     >}`,
     IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    ValidTypeError = `❌ Only finalized expressions of type 'TypedRegExp' can be appended`,
+    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
     InstanceHasNoOverlap = NoOverlap<TState["names"], [...CurState["names"], Name]>,
     InstanceOverlapErr = `❌ The name '${Join<InstanceHasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
       [...CurState["names"], Name]
@@ -77,8 +77,8 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
       Assert<NameIsNotEmpty, NameEmptyErr> &
       Assert<NameStartsWithLetter, NameDoesNotStartWithLetterErr> &
       Assert<NameHasNoOverlap, NameOverlapErr>,
-    instance: Assert<IsValidType, ValidTypeError> &
-      TypedRegExp<TState> &
+    instance: Assert<IsValidType, InvalidTypeErr> &
+      BaseRegExp<TState> &
       Assert<InstanceHasNoOverlap, InstanceOverlapErr>
   ) => {
     const newState = instance.getState()
@@ -97,9 +97,9 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
   append = <
     TState extends State,
     IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr extends string = `❌ Only finalized expressions of type 'TypedRegExp' can be appended`,
+    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
     HasNoOverlap = NoOverlap<TState["names"], CurState["names"]>,
-    OverlapErr extends string = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
+    OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
       CurState["names"]
     >}`
   >(
@@ -120,6 +120,7 @@ export class Appenders<CurState extends State> extends BaseRegExp<CurState> {
   }
 
   static create() {
-    return new Appenders(createState({ msg: "⏳ Select Input..." }))
+    const state = createState({ msg: "⏳ Select Input..." })
+    return new Appenders(state)
   }
 }
