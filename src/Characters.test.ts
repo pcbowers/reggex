@@ -1,15 +1,6 @@
 import { createState } from "@utils"
 import { describe, expect, it } from "vitest"
-import {
-  anyChar,
-  capture,
-  controlChar,
-  hexCode,
-  match,
-  namedCapture,
-  unicodeChar,
-  wordChar,
-} from "./index"
+import { anyChar, controlChar, hexCode, unicodeChar, wordChar } from "./index"
 
 describe("characters", () => {
   describe("anyChar", () => {
@@ -58,27 +49,6 @@ describe("characters", () => {
     it("works", () => {
       const test = wordChar
       expect(test.getState()).toMatchObject(createState({ curExp: "\\w" }))
-    })
-  })
-
-  describe("backreferenceTo", () => {
-    it("works with a numbered reference", () => {
-      const test = capture(match.anyChar).and.backreferenceTo(1)
-      expect(test.getState()).toMatchObject(
-        createState({ curExp: "\\1", prvExp: "(.)", groups: ["(.)"] })
-      )
-    })
-
-    it("works with a named reference", () => {
-      const test = namedCapture("test", match.anyChar).and.backreferenceTo("test")
-      expect(test.getState()).toMatchObject(
-        createState({
-          curExp: "\\k<test>",
-          prvExp: "(?<test>.)",
-          names: ["test"],
-          groups: ["(?<test>.)"],
-        })
-      )
     })
   })
 })
