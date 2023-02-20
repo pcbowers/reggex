@@ -1,8 +1,9 @@
 /// <reference types="vitest" />
-import { resolve } from "path"
 import { defineConfig } from "vite"
+import tsconfigPaths from "vite-tsconfig-paths"
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     coverage: {
       enabled: true,
@@ -12,11 +13,5 @@ export default defineConfig({
     },
     reporters: process.env.CI ? ["junit"] : ["verbose"],
     outputFile: process.env.CI ? "junit.xml" : undefined,
-  },
-  resolve: {
-    alias: {
-      "@types": resolve(__dirname, "src/types/index"),
-      "@utils": resolve(__dirname, "src/utils/index"),
-    },
   },
 })
