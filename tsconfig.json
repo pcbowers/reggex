@@ -15,11 +15,10 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@types": ["./src/types/index"],
-      "@utils": ["./src/utils/index"]
+      "@types": ["./types/index"],
+      "@utils": ["./utils/index"]
     }
-  },
-  "include": ["src"]
+  }
 }

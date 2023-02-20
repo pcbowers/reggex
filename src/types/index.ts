@@ -1,6 +1,6 @@
 export * from "./arithmetic"
 export * from "./assertions"
-export * from "./formatting"
+export * from "./converters"
 export * from "./state"
 
 /**
@@ -34,4 +34,18 @@ export type Letter = LowerCaseLetter | UpperCaseLetter
 /**
  * A type that helps unwrap deeply nested types
  */
-export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never
+export type Expand<T> = T extends infer O
+  ? O extends Record<any, any>
+    ? { [K in keyof O]: O[K] }
+    : O
+  : never
+
+/**
+ * A helper type to extract the return type of a method
+ */
+export type RegularMethod<T> = T extends (...args: any[]) => any ? ReturnType<T> : never
+
+/**
+ * A helper type to extract the return type of a getter method
+ */
+export type GetMethod<T> = ReturnType<RegularMethod<T>>

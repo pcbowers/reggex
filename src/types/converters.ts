@@ -45,3 +45,13 @@ export type Join<Tuple, Delimiter extends string = " | "> = Tuple extends [
       : "N/A"
     : "N/A"
   : "N/A"
+
+/**
+ * Convert a tuple to an intersection
+ * @param T The type to intersect with
+ * @param U The tuple to convert
+ * @returns The intersection of T and U
+ */
+export type TupleToIntersection<T, U extends any[]> = U extends [infer First, ...infer Rest]
+  ? T & TupleToIntersection<First, Rest>
+  : T
