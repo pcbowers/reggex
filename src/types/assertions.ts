@@ -1,4 +1,4 @@
-import { Add, Primitive, Subtract } from "@types"
+import { Add, Primitive, Subtract, Replace } from "@types"
 
 /**
  * A unique symbol used to brand error types
@@ -13,23 +13,6 @@ declare const brand: unique symbol
 declare interface Err<Token> {
   readonly [brand]: Token
 }
-
-/**
- * Replace all instances of a search string with a replacement string
- * @param Input The string to search
- * @param Replacement The string to replace the search string with
- * @param Search The string to search for
- * @returns The string with all instances of the search string replaced with the replacement string
- */
-export type Replace<
-  Input,
-  Replacement,
-  Search extends Primitive = "$"
-> = Input extends `${infer Head}${Search}${infer Tail}`
-  ? Replacement extends Primitive
-    ? `${Head}${Replacement}${Replace<Tail, Replacement, Search>}`
-    : Input
-  : Input
 
 /**
  * Assert that a type is true, otherwise throw an error
