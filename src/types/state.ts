@@ -1,5 +1,5 @@
 import { Expand, Length, MapAdd, Primitive } from "@types"
-import { DEFAULT_STATE } from "@utils"
+import { DEFAULT_MESSAGE } from "@utils"
 
 /**
  * Merge two tuples of primitives
@@ -50,21 +50,38 @@ export interface State<
   groups: [...Groups]
 }
 
+export interface InferState<
+  TState extends State<Msg, CurExp, PrvExp, Names, Groups>,
+  Msg extends Primitive = TState["msg"],
+  CurExp extends string = TState["curExp"],
+  PrvExp extends string = TState["prvExp"],
+  Names extends string[] = TState["names"],
+  Groups extends string[] = TState["groups"]
+> {
+  msg: Msg
+  curExp: CurExp
+  prvExp: PrvExp
+  names: [...Names]
+  groups: [...Groups]
+}
+
 /**
  * Merge two states
  * @param CurState Current state
  * @param NewState New state
  * @returns NewState if defined, CurState if defined, otherwise never. If NewState["msg"] is never, then the default "msg" is used.
  */
-export type StateMerger<CurState extends State, NewState extends State> = Expand<{
-  [Key in keyof State]: State[Key] extends Primitive[]
-    ? [...MergePrimitiveTuple<CurState[Key], NewState[Key]>]
-    : Key extends "msg"
-    ? [NewState[Key]] extends [never]
-      ? (typeof DEFAULT_STATE)["msg"]
+export type StateMerger<CurState extends State, NewState extends State> = InferState<
+  Expand<{
+    [Key in keyof State]: State[Key] extends Primitive[]
+      ? [...MergePrimitiveTuple<CurState[Key], NewState[Key]>]
+      : Key extends "msg"
+      ? [NewState[Key]] extends [never]
+        ? typeof DEFAULT_MESSAGE
+        : MergePrimitive<CurState[Key], NewState[Key]>
       : MergePrimitive<CurState[Key], NewState[Key]>
-    : MergePrimitive<CurState[Key], NewState[Key]>
-}>
+  }>
+>
 
 /**
  * Get the indices of a tuple

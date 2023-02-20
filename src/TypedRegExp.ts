@@ -1,25 +1,21 @@
-import { Primitive, State } from "@types"
-import { Group } from "./Group"
-import { Input } from "./Input"
-import { Quantifier } from "./Quantifier"
-import { StateManager } from "./StateManager"
+import { State } from "@types"
+import { assign } from "@utils"
+import { BaseRegExp } from "./BaseRegExp"
+import { Groups } from "./Groups"
+import { Appenders } from "./Appenders"
+import { Characters } from "./Characters"
+import { Quantifiers } from "./Quantifiers"
 
-export class TypedRegExp<
-  CurState extends State<Msg, CurExp, PrvExp, Names, Groups>,
-  Msg extends Primitive = CurState["msg"],
-  CurExp extends string = CurState["curExp"],
-  PrvExp extends string = CurState["prvExp"],
-  Names extends string[] = CurState["names"],
-  Groups extends string[] = CurState["groups"]
-> extends StateManager<CurState> {
+export class TypedRegExp<CurState extends State> extends BaseRegExp<CurState> {
   get thatOccurs() {
-    const that = this
-    return Object.assign(new Quantifier(this.merge({ msg: "⏳️ Select greedy Quantifier..." })), {
+    const greedyState = this.merge({ msg: "⏳️ Select greedy Quantifier..." })
+    const lazyState = this.merge({ msg: "⏳️ Select lazy Quantifier..." })
+    return assign(new Quantifiers(greedyState), {
       get lazily() {
-        return new Quantifier(that.merge({ msg: "⏳️ Select lazy Quantifier..." }))
+        return new Quantifiers(lazyState)
       },
       get greedily() {
-        return new Quantifier(that.merge({ msg: "⏳️ Select greedy Quantifier..." }))
+        return new Quantifiers(greedyState)
       },
     })
   }
@@ -29,7 +25,7 @@ export class TypedRegExp<
   }
 
   get groupedAs() {
-    return new Group(this.merge({ msg: "⏳️ Select Group..." }))
+    return new Groups(this.merge({ msg: "⏳️ Select Group..." }))
   }
 
   get as() {
@@ -37,14 +33,12 @@ export class TypedRegExp<
   }
 
   get and() {
-    return new Input(
-      this.merge(
-        this.merge({
-          msg: "⏳ Select Input...",
-          curExp: "",
-          prvExp: `${this.state.prvExp}${this.state.curExp}`,
-        })
-      )
-    )
+    const newState = this.merge({
+      msg: "⏳ Select Input...",
+      curExp: "",
+      prvExp: `${this.state.prvExp}${this.state.curExp}`,
+    })
+
+    return assign(new Characters(newState), new Appenders(newState))
   }
 }

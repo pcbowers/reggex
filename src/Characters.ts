@@ -1,0 +1,72 @@
+import { Assert, GroupReferences, HexChar, Join, Letter, OfLength, State } from "@types"
+import { createState } from "@utils"
+import { BaseRegExp } from "./BaseRegExp"
+import { TypedRegExp } from "./TypedRegExp"
+
+export class Characters<CurState extends State> extends BaseRegExp<CurState> {
+  get anyChar() {
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}.` }))
+  }
+
+  get wordChar() {
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\w` }))
+  }
+
+  controlChar = <
+    ControlChar extends string,
+    IsLetter = OfLength<ControlChar, 1, Letter>,
+    NotLetterErr = `❌ The control character '${ControlChar}' must be a single letter from A-Z`
+  >(
+    controlChar: ControlChar & Assert<IsLetter, NotLetterErr>
+  ) => {
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\c${controlChar}` }))
+  }
+
+  hexCode = <
+    HexCode extends string,
+    IsHexChar = OfLength<HexCode, number, HexChar>,
+    HexCharErr = `❌ The HexCode '${HexCode}' must only contain valid hexidecimal digits`,
+    IsProperLength = OfLength<HexCode, 2 | 4>,
+    ImproperLengthErr = `❌ The HexCode '${HexCode}' must be a length of 2 or 4`,
+    CharType extends string = OfLength<HexCode, 2> extends true ? "\\x" : "\\u"
+  >(
+    hexChars: HexCode & Assert<IsHexChar, HexCharErr> & Assert<IsProperLength, ImproperLengthErr>
+  ) => {
+    const charType = (hexChars.length === 2 ? "\\x" : "\\u") as CharType
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${charType}${hexChars}` }))
+  }
+
+  unicodeChar = <
+    UnicodeChar extends string,
+    IsHexChar = OfLength<UnicodeChar, number, HexChar>,
+    HexCharErr = `❌ The UnicodeChar '${UnicodeChar}' must only contain valid hexidecimal digits`,
+    IsProperLength = OfLength<UnicodeChar, 4 | 5>,
+    ImproperLengthErr = `❌ The UnicodeChar '${UnicodeChar}' must be a length of 4 or 5`
+  >(
+    unicodeChar: UnicodeChar &
+      Assert<IsHexChar, HexCharErr> &
+      Assert<IsProperLength, ImproperLengthErr>
+  ) => {
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
+  }
+
+  backreferenceTo = <
+    PossibleRefs extends (string | number)[] = GroupReferences<
+      CurState["names"],
+      CurState["groups"]
+    >,
+    Ref extends string | number = PossibleRefs[number],
+    IsValidRef = Ref extends PossibleRefs[number] ? true : false,
+    InvalidRefErr = `❌ The Reference '${Ref}' is not a valid backreference. Possible values include: ${Join<PossibleRefs>}`,
+    RefType extends string = Ref extends string ? `\\k<${Ref}>` : `\\${Ref}`
+  >(
+    ref: Assert<IsValidRef, InvalidRefErr> & Ref
+  ) => {
+    const refType = (typeof ref === "string" ? `\\k<${ref}>` : `\\${ref}`) as RefType
+    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${refType}` }))
+  }
+
+  static create() {
+    return new Characters(createState({ msg: "⏳ Select Input..." }))
+  }
+}
