@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
+    "noErrorTruncation": true,
     "baseUrl": "./src",
     "paths": {
       "@types": ["./types/index"],

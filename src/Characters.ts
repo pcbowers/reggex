@@ -1,4 +1,4 @@
-import { Assert, GroupReferences, HexChar, Join, Letter, OfLength, State } from "@types"
+import { Assert, HexChar, Letter, OfLength, State } from "@types"
 import { createState } from "@utils"
 import { BaseRegExp } from "./BaseRegExp"
 import { TypedRegExp } from "./TypedRegExp"
@@ -48,22 +48,6 @@ export class Characters<CurState extends State> extends BaseRegExp<CurState> {
       Assert<IsProperLength, ImproperLengthErr>
   ) => {
     return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
-  }
-
-  backreferenceTo = <
-    PossibleRefs extends (string | number)[] = GroupReferences<
-      CurState["names"],
-      CurState["groups"]
-    >,
-    Ref extends string | number = PossibleRefs[number],
-    IsValidRef = Ref extends PossibleRefs[number] ? true : false,
-    InvalidRefErr = `❌ The Reference '${Ref}' is not a valid backreference. Possible values include: ${Join<PossibleRefs>}`,
-    RefType extends string = Ref extends string ? `\\k<${Ref}>` : `\\${Ref}`
-  >(
-    ref: Assert<IsValidRef, InvalidRefErr> & Ref
-  ) => {
-    const refType = (typeof ref === "string" ? `\\k<${ref}>` : `\\${ref}`) as RefType
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${refType}` }))
   }
 
   static create() {
