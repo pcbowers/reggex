@@ -1,5 +1,11 @@
 # reggex
 
+## 0.2.3
+
+### Patch Changes
+
+- 0416db0: Update LICENSE (increased year and updated name)
+
 ## 0.2.2
 
 ### Patch Changes
