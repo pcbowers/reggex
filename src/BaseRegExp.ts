@@ -2,6 +2,11 @@ import { merger } from "@utils"
 import { InferState, State } from "./types/state"
 
 export class BaseRegExp<CurState extends State> {
+  /**
+   * Merge the current state with the new state
+   * @param newState The new state to merge with the default state
+   * @returns The merged state
+   */
   protected merge
 
   constructor(protected state: InferState<CurState>) {

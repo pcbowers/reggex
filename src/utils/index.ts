@@ -2,6 +2,11 @@ import { Expand, InferState, Primitive, State, StateMerger, TupleToIntersection 
 
 export const DEFAULT_MESSAGE = "⚡ Ready for RegExp conversion!" as const
 
+/**
+ * Create a new state object
+ * @param state The state object to merge with the default state
+ * @returns The new state object
+ */
 export function createState<
   Msg extends Primitive = typeof DEFAULT_MESSAGE,
   CurExp extends string = "",
@@ -20,7 +25,12 @@ export function createState<
   }
 }
 
-export function merger<DefaultState extends State>(defaultState: InferState<DefaultState>) {
+/**
+ * Create a function that merges the current state with the new state
+ * @param curState The current state
+ * @returns A function that merges the current state with the new state
+ */
+export function merger<CurState extends State>(curState: InferState<CurState>) {
   return function <
     NewState extends State<NewMsg, NewCurExp, NewPrvExp, NewNames, NewGroups>,
     NewMsg extends Primitive = never,
@@ -30,25 +40,33 @@ export function merger<DefaultState extends State>(defaultState: InferState<Defa
     NewGroups extends string[] = never
   >(
     newState: Partial<State<NewMsg, NewCurExp, NewPrvExp, NewNames, NewGroups>>
-  ): StateMerger<DefaultState, NewState> {
+  ): StateMerger<CurState, NewState> {
     return {
       msg: newState.msg ?? DEFAULT_MESSAGE,
-      curExp: newState.curExp ?? defaultState.curExp,
-      prvExp: newState.prvExp ?? defaultState.prvExp,
-      names: [...(newState.names ?? defaultState.names)],
-      groups: [...(newState.groups ?? defaultState.groups)],
-    } as StateMerger<DefaultState, NewState>
+      curExp: newState.curExp ?? curState.curExp,
+      prvExp: newState.prvExp ?? curState.prvExp,
+      names: [...(newState.names ?? curState.names)],
+      groups: [...(newState.groups ?? curState.groups)],
+    } as StateMerger<CurState, NewState>
   }
 }
 
+/**
+ * A better Object.assign that merges the prototype properties while keeping the enumerable property descriptors
+ * @param target The target object
+ * @param sources The source objects
+ * @returns The target object with the merged properties from the source objects
+ */
 export function assign<T extends Record<any, any>, U extends Record<any, any>[]>(
   target: T,
   ...sources: U
 ): TupleToIntersection<T, U> {
+  // Check if the source object is a class
   const isClass = (source: U[number]) => {
     return !Object.getOwnPropertyNames(Object.getPrototypeOf(source)).includes("__proto__")
   }
 
+  // Get the keys of the source object
   const getKeys = (source: U[number]) => {
     const keys = Object.keys(source)
     const protoKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(source))
@@ -60,6 +78,7 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
     return keys
   }
 
+  // Get the symbols of the source object
   const getSyms = (source: U[number]) => {
     const syms = Object.getOwnPropertySymbols(source)
     const protoSyms = Object.getOwnPropertySymbols(Object.getPrototypeOf(source))
@@ -70,6 +89,7 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
     return syms
   }
 
+  // Get the property descriptor of the source object
   const getDescriptor = (source: U[number], key: PropertyKey) => {
     if (isClass(source)) {
       const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(source), key)
@@ -79,7 +99,9 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
     return Object.getOwnPropertyDescriptor(source, key)
   }
 
+  // Loop through the source objects and get the property descriptors
   sources.forEach((source) => {
+    // Get the property descriptors
     const descriptors = getKeys(source).reduce<Record<PropertyKey, PropertyDescriptor>>(
       (descriptors, key) => {
         const descriptor = getDescriptor(source, key)
@@ -89,6 +111,7 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
       {}
     )
 
+    // Get the symbol property descriptors
     getSyms(source).forEach((sym) => {
       const descriptor = getDescriptor(source, sym)
       if (descriptor?.enumerable) {
@@ -96,8 +119,10 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
       }
     })
 
+    // Assign the property descriptors to the target object
     Object.defineProperties(target, descriptors)
   })
 
+  // Return the target object
   return target as TupleToIntersection<T, U>
 }
