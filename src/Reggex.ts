@@ -3,7 +3,7 @@ import { assign } from "@utils"
 import { BaseReggex } from "./BaseReggex"
 import { Groups } from "./Groups"
 import { Appenders } from "./Appenders"
-import { Characters } from "./Characters"
+import { Inputs } from "./Inputs"
 import { Quantifiers } from "./Quantifiers"
 
 export class Reggex<CurState extends State> extends BaseReggex<CurState> {
@@ -39,6 +39,6 @@ export class Reggex<CurState extends State> extends BaseReggex<CurState> {
       prvExp: `${this.state.prvExp}${this.state.curExp}`,
     })
 
-    return assign(new Characters(newState), new Appenders(newState))
+    return assign(new Inputs(newState), new Appenders(newState))
   }
 }

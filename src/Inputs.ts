@@ -3,7 +3,7 @@ import { createState } from "@utils"
 import { BaseReggex } from "./BaseReggex"
 import { Reggex } from "./Reggex"
 
-export class Characters<CurState extends State> extends BaseReggex<CurState> {
+export class Inputs<CurState extends State> extends BaseReggex<CurState> {
   get anyChar(): Reggex<
     StateMerger<CurState, State<never, `${CurState["curExp"]}.`, never, never, never>>
   > {
@@ -53,7 +53,7 @@ export class Characters<CurState extends State> extends BaseReggex<CurState> {
   }
 
   static create() {
-    const state = createState({ curExp: "" })
-    return new Characters(state)
+    const state = createState({ msg: "⏳ Select Input..." })
+    return new Inputs(state)
   }
 }

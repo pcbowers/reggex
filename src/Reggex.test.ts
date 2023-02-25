@@ -1,28 +1,28 @@
 import { GetMethod, RegularMethod } from "@types"
 import { createState, DEFAULT_MESSAGE } from "@utils"
 import { describe, expect, it } from "vitest"
-import { Characters, match, State, Reggex } from "./index"
+import { Inputs, match, State, Reggex } from "./index"
 
-declare module "./Characters" {
-  interface Characters<CurState extends State> {
+declare module "./Inputs" {
+  interface Inputs<CurState extends State> {
     readonly gmailDomain: GetMethod<typeof gmailDomain<CurState>>
     domain: RegularMethod<typeof domain<CurState>>
     helloString: ReturnType<typeof helloString>
   }
 }
 
-const gmailDomain = Characters.extend(
+const gmailDomain = Inputs.extend(
   <CurState extends State>() => {
-    return function (this: Characters<CurState>) {
+    return function (this: Inputs<CurState>) {
       return new Reggex(this.merge({ curExp: `${this.state.curExp}\\bgmail.com\\b` }))
     }
   },
   { name: "gmailDomain", type: "getMethod" }
 )
 
-const domain = Characters.extend(
+const domain = Inputs.extend(
   <CurState extends State>() => {
-    return function <Domain extends string>(this: Characters<CurState>, domain: Domain) {
+    return function <Domain extends string>(this: Inputs<CurState>, domain: Domain) {
       return new Reggex(
         this.merge({
           curExp: `${this.state.curExp}\\b${domain}\\b`,
@@ -34,7 +34,7 @@ const domain = Characters.extend(
   { name: "domain", type: "method" }
 )
 
-const helloString = Characters.extend(
+const helloString = Inputs.extend(
   () => {
     return "hello" as const
   },

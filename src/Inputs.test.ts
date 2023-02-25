@@ -2,7 +2,7 @@ import { createState } from "@utils"
 import { describe, expect, it } from "vitest"
 import { anyChar, controlChar, hexCode, unicodeChar, wordChar } from "./index"
 
-describe("characters", () => {
+describe("Inputs", () => {
   describe("anyChar", () => {
     it("works", () => {
       const test = anyChar
