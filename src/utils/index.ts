@@ -21,7 +21,7 @@ export function createState<
     curExp: (state?.curExp ?? "") as CurExp,
     prvExp: (state?.prvExp ?? "") as PrvExp,
     names: (state?.names ?? []) as Names,
-    groups: (state?.groups ?? []) as Groups,
+    groups: (state?.groups ?? []) as Groups
   }
 }
 
@@ -46,7 +46,7 @@ export function merger<CurState extends State>(curState: InferState<CurState>) {
       curExp: newState.curExp ?? curState.curExp,
       prvExp: newState.prvExp ?? curState.prvExp,
       names: [...(newState.names ?? curState.names)],
-      groups: [...(newState.groups ?? curState.groups)],
+      groups: [...(newState.groups ?? curState.groups)]
     } as StateMerger<CurState, NewState>
   }
 }
@@ -57,6 +57,7 @@ export function merger<CurState extends State>(curState: InferState<CurState>) {
  * @param sources The source objects
  * @returns The target object with the merged properties from the source objects
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function assign<T extends Record<any, any>, U extends Record<any, any>[]>(
   target: T,
   ...sources: U

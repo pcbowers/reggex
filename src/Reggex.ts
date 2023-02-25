@@ -16,7 +16,7 @@ export class Reggex<CurState extends State> extends BaseReggex<CurState> {
       },
       get greedily() {
         return new Quantifiers(greedyState)
-      },
+      }
     })
   }
 
@@ -36,7 +36,7 @@ export class Reggex<CurState extends State> extends BaseReggex<CurState> {
     const newState = this.merge({
       msg: "⏳ Select Input...",
       curExp: "",
-      prvExp: `${this.state.prvExp}${this.state.curExp}`,
+      prvExp: `${this.state.prvExp}${this.state.curExp}`
     })
 
     return assign(new Inputs(newState), new Appenders(newState))

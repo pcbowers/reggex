@@ -23,7 +23,7 @@ export class BaseReggex<CurState extends State> {
       curExp: this.state.curExp,
       prvExp: this.state.prvExp,
       names: [...this.state.names],
-      groups: [...this.state.groups],
+      groups: [...this.state.groups]
     }
   }
 
@@ -33,7 +33,7 @@ export class BaseReggex<CurState extends State> {
    * @param options The options for the method (name, type)
    * @returns The passed in method for type inference
    */
-  static extend<Return, ExtenderFunction extends (...args: any[]) => Return>(
+  static extend<Return, ExtenderFunction extends (...args: unknown[]) => Return>(
     value: ExtenderFunction,
     options: {
       name: string
@@ -41,7 +41,7 @@ export class BaseReggex<CurState extends State> {
     }
   ): ExtenderFunction {
     Object.defineProperty(this.prototype, options.name, {
-      [options.type === "getMethod" ? "get" : "value"]: value(),
+      [options.type === "getMethod" ? "get" : "value"]: value()
     })
 
     return value

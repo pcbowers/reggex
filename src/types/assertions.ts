@@ -20,6 +20,7 @@ declare interface Err<Token> {
  * @param ErrorMessage The error message to throw if the assertion fails
  * @returns An empty object if the assertion is true, otherwise an error type
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type Assert<T, ErrorMessage = "ERROR"> = T extends true ? {} : Err<Replace<ErrorMessage, T>>
 
 /**
@@ -58,7 +59,7 @@ export type Contains<
 export type StartsWith<
   Str extends Primitive,
   StrToCheck extends Primitive
-> = Str extends `${StrToCheck}${any}` ? true : false
+> = Str extends `${StrToCheck}${string}` ? true : false
 
 /**
  * Check if a string is of a certain length

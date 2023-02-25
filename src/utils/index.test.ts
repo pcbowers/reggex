@@ -21,7 +21,7 @@ describe("utils", () => {
         curExp: "test",
         prvExp: "test",
         names: ["test"],
-        groups: ["test"],
+        groups: ["test"]
       })
 
       expect(test.msg).toBe("test")
@@ -35,6 +35,7 @@ describe("utils", () => {
   describe("merger", () => {
     it("merges the msg appropriately", () => {
       const merge = merger(createState({ msg: "test" }))
+
       expect(merge({ msg: "test2" }).msg).toEqual("test2")
       expect(merge({ msg: "" }).msg).toEqual("")
       expect(merge({ msg: 0 }).msg).toEqual(0)
@@ -45,6 +46,7 @@ describe("utils", () => {
 
     it("merges the curExp appropriately", () => {
       const merge = merger(createState({ curExp: "test" }))
+
       expect(merge({ curExp: "test2" }).curExp).toEqual("test2")
       expect(merge({ curExp: "" }).curExp).toEqual("")
       expect(merge({ curExp: undefined }).curExp).toEqual("test")
@@ -53,6 +55,7 @@ describe("utils", () => {
 
     it("merges the prvExp appropriately", () => {
       const merge = merger(createState({ prvExp: "test" }))
+
       expect(merge({ prvExp: "test2" }).prvExp).toEqual("test2")
       expect(merge({ prvExp: "" }).prvExp).toEqual("")
       expect(merge({ prvExp: undefined }).prvExp).toEqual("test")
@@ -61,6 +64,7 @@ describe("utils", () => {
 
     it("merges the names appropriately", () => {
       const merge = merger(createState({ names: ["test"] }))
+
       expect(merge({ names: ["test2"] }).names).toEqual(["test2"])
       expect(merge({ names: [] }).names).toEqual([])
       expect(merge({ names: undefined }).names).toEqual(["test"])
@@ -69,6 +73,7 @@ describe("utils", () => {
 
     it("merges the groups appropriately", () => {
       const merge = merger(createState({ groups: ["test"] }))
+
       expect(merge({ groups: ["test2"] }).groups).toEqual(["test2"])
       expect(merge({ groups: [] }).groups).toEqual([])
       expect(merge({ groups: undefined }).groups).toEqual(["test"])
@@ -91,6 +96,7 @@ describe("utils", () => {
 
     it("works like Object.assign", () => {
       const methodFunc = () => "test test"
+
       expect(
         assign(
           { a: 1 },
@@ -100,7 +106,7 @@ describe("utils", () => {
           { e: 3 },
           {
             [property]: "test",
-            [method]: methodFunc,
+            [method]: methodFunc
           }
         )
       ).toEqual({
@@ -110,7 +116,7 @@ describe("utils", () => {
         d: 3,
         e: 3,
         [property]: "test",
-        [method]: methodFunc,
+        [method]: methodFunc
       })
     })
 
@@ -124,12 +130,13 @@ describe("utils", () => {
         [property]: "test",
         get [method]() {
           return this[property] + " test"
-        },
+        }
       })
     })
 
     it("allows instances to be assigned with objects", () => {
       const test = assign(new TestClass(), { a: 1 })
+
       expect(test).toEqual({ a: 1, b: 2, [property]: "test" })
       expect(test.c).toEqual(3)
       expect(test[method]).toEqual("test test")
@@ -150,7 +157,7 @@ describe("utils", () => {
           [property]: "test",
           get [method]() {
             return this[property] + " test"
-          },
+          }
         })
       )
     })

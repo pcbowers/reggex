@@ -33,7 +33,7 @@ export class Groups<CurState extends State> extends BaseReggex<CurState> {
       this.merge({
         curExp: group,
         names: [...this.state.names, name],
-        groups: [...this.state.groups, group],
+        groups: [...this.state.groups, group]
       })
     )
   }
