@@ -1,7 +1,7 @@
 import { GetMethod, RegularMethod } from "@types"
 import { createState, DEFAULT_MESSAGE } from "@utils"
 import { describe, expect, it } from "vitest"
-import { Characters, match, State, TypedRegExp } from "./index"
+import { Characters, match, State, Reggex } from "./index"
 
 declare module "./Characters" {
   interface Characters<CurState extends State> {
@@ -14,7 +14,7 @@ declare module "./Characters" {
 const gmailDomain = Characters.extend(
   <CurState extends State>() => {
     return function (this: Characters<CurState>) {
-      return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\bgmail.com\\b` }))
+      return new Reggex(this.merge({ curExp: `${this.state.curExp}\\bgmail.com\\b` }))
     }
   },
   { name: "gmailDomain", type: "getMethod" }
@@ -23,7 +23,7 @@ const gmailDomain = Characters.extend(
 const domain = Characters.extend(
   <CurState extends State>() => {
     return function <Domain extends string>(this: Characters<CurState>, domain: Domain) {
-      return new TypedRegExp(
+      return new Reggex(
         this.merge({
           curExp: `${this.state.curExp}\\b${domain}\\b`,
           groups: [...this.state.groups, "test"],
@@ -41,7 +41,7 @@ const helloString = Characters.extend(
   { name: "helloString", type: "value" }
 )
 
-describe("TypedRegExp", () => {
+describe("Reggex", () => {
   describe("DEFAULT_MESSAGE", () => {
     it("is a string", () => {
       expect(typeof DEFAULT_MESSAGE).toBe("string")

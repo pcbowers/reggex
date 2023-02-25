@@ -1,12 +1,12 @@
 import { State } from "@types"
 import { assign } from "@utils"
-import { BaseRegExp } from "./BaseRegExp"
+import { BaseReggex } from "./BaseReggex"
 import { Groups } from "./Groups"
 import { Appenders } from "./Appenders"
 import { Characters } from "./Characters"
 import { Quantifiers } from "./Quantifiers"
 
-export class TypedRegExp<CurState extends State> extends BaseRegExp<CurState> {
+export class Reggex<CurState extends State> extends BaseReggex<CurState> {
   get thatOccurs() {
     const greedyState = this.merge({ msg: "⏳️ Select greedy Quantifier..." })
     const lazyState = this.merge({ msg: "⏳️ Select lazy Quantifier..." })

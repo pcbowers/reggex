@@ -102,13 +102,17 @@ export type WrapSearch<
   PreSearch extends Primitive,
   PostSearch extends Primitive
 > = Input extends `${infer Head}${PreSearch}${infer Middle}${PostSearch}${infer Tail}`
-  ? `${Head}${PreSearch}${Prefix}${Middle}${Suffix}${PostSearch}${WrapSearch<
-      Tail,
-      Prefix,
-      Suffix,
-      PreSearch,
-      PostSearch
-    >}`
+  ? Head extends `${string}\\`
+    ? Input extends Primitive
+      ? Input
+      : never
+    : `${Head}${PreSearch}${Prefix}${Middle}${Suffix}${PostSearch}${WrapSearch<
+        Tail,
+        Prefix,
+        Suffix,
+        PreSearch,
+        PostSearch
+      >}`
   : Input extends Primitive
   ? Input
   : never
