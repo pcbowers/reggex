@@ -1,15 +1,15 @@
 import { Assert, Join, Letter, NoOverlap, OfLength, StartsWith, State } from "@types"
-import { BaseRegExp } from "./BaseRegExp"
-import { TypedRegExp } from "./TypedRegExp"
+import { BaseReggex } from "./BaseReggex"
+import { Reggex } from "./Reggex"
 
-export class Groups<CurState extends State> extends BaseRegExp<CurState> {
+export class Groups<CurState extends State> extends BaseReggex<CurState> {
   get nonCapture() {
-    return new TypedRegExp(this.merge({ curExp: `(?:${this.state.curExp})` }))
+    return new Reggex(this.merge({ curExp: `(?:${this.state.curExp})` }))
   }
 
   get capture() {
     const group = `(${this.state.curExp})` as const
-    return new TypedRegExp(this.merge({ curExp: group, groups: [...this.state.groups, group] }))
+    return new Reggex(this.merge({ curExp: group, groups: [...this.state.groups, group] }))
   }
 
   namedCapture = <
@@ -29,7 +29,7 @@ export class Groups<CurState extends State> extends BaseRegExp<CurState> {
       Assert<HasNoOverlap, OverlapErr>
   ) => {
     const group = `(?<${name}>${this.state.curExp})` as const
-    return new TypedRegExp(
+    return new Reggex(
       this.merge({
         curExp: group,
         names: [...this.state.names, name],

@@ -1,4 +1,4 @@
-import { Expand, Length, MapAdd, Primitive } from "@types"
+import { Expand, Length, MapAdd, MapWrap, MapWrapSearch, Primitive, WrapSearch } from "@types"
 import { DEFAULT_MESSAGE } from "@utils"
 
 /**
@@ -34,7 +34,7 @@ type MergePrimitive<T, S> = [S] extends [never]
   : never
 
 /**
- * The State of a TypedRegExp
+ * The State of a Reggex
  * @param Msg The message to use to help indicate the user what is going on
  * @param CurExp The current expression
  * @param PrvExp The previous expression
@@ -56,7 +56,7 @@ export interface State<
 }
 
 /**
- * A helper type to infer the state of a TypedRegExp
+ * A helper type to infer the state of a Reggex
  * @param Msg The message to use to help indicate the user what is going on
  * @param CurExp The current expression
  * @param PrvExp The previous expression
@@ -130,3 +130,28 @@ export type GroupReferences<Names extends Primitive[], Groups extends Primitive[
   ...Names,
   ...MapAdd<TupleIndices<Groups>, 1>
 ]
+
+/**
+ *  Namespace named capture groups with a prefix or suffix
+ * @param TState The state to namespace
+ * @param Prefix The prefix to use
+ * @param Suffix The suffix to use
+ * @returns Namespaced state
+ */
+export type NamespaceState<
+  TState extends State,
+  Prefix extends string = "",
+  Suffix extends string = ""
+> = State<
+  TState["msg"],
+  WrapSearch<WrapSearch<TState["curExp"], Prefix, Suffix, "?<", ">">, Prefix, Suffix, "\\k<", ">">,
+  WrapSearch<WrapSearch<TState["prvExp"], Prefix, Suffix, "?<", ">">, Prefix, Suffix, "\\k<", ">">,
+  MapWrap<TState["names"], Prefix, Suffix>,
+  MapWrapSearch<
+    MapWrapSearch<TState["groups"], Prefix, Suffix, "?<", ">">,
+    Prefix,
+    Suffix,
+    "\\k<",
+    ">"
+  >
+>

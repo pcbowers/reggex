@@ -7,7 +7,7 @@ export * from "./Groups"
 export * from "./Appenders"
 export * from "./Characters"
 export * from "./Quantifiers"
-export * from "./TypedRegExp"
+export * from "./Reggex"
 
 export const anyChar = Characters.create().anyChar
 export const controlChar = Characters.create().controlChar

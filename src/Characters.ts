@@ -1,15 +1,17 @@
-import { Assert, HexChar, Letter, OfLength, State } from "@types"
+import { Assert, HexChar, Letter, OfLength, State, StateMerger } from "@types"
 import { createState } from "@utils"
-import { BaseRegExp } from "./BaseRegExp"
-import { TypedRegExp } from "./TypedRegExp"
+import { BaseReggex } from "./BaseReggex"
+import { Reggex } from "./Reggex"
 
-export class Characters<CurState extends State> extends BaseRegExp<CurState> {
-  get anyChar() {
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}.` }))
+export class Characters<CurState extends State> extends BaseReggex<CurState> {
+  get anyChar(): Reggex<
+    StateMerger<CurState, State<never, `${CurState["curExp"]}.`, never, never, never>>
+  > {
+    return new Reggex(this.merge({ curExp: `${this.state.curExp}.` }))
   }
 
   get wordChar() {
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\w` }))
+    return new Reggex(this.merge({ curExp: `${this.state.curExp}\\w` }))
   }
 
   controlChar = <
@@ -19,7 +21,7 @@ export class Characters<CurState extends State> extends BaseRegExp<CurState> {
   >(
     controlChar: ControlChar & Assert<IsLetter, NotLetterErr>
   ) => {
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\c${controlChar}` }))
+    return new Reggex(this.merge({ curExp: `${this.state.curExp}\\c${controlChar}` }))
   }
 
   hexCode = <
@@ -33,7 +35,7 @@ export class Characters<CurState extends State> extends BaseRegExp<CurState> {
     hexChars: HexCode & Assert<IsHexChar, HexCharErr> & Assert<IsProperLength, ImproperLengthErr>
   ) => {
     const charType = (hexChars.length === 2 ? "\\x" : "\\u") as CharType
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}${charType}${hexChars}` }))
+    return new Reggex(this.merge({ curExp: `${this.state.curExp}${charType}${hexChars}` }))
   }
 
   unicodeChar = <
@@ -47,7 +49,7 @@ export class Characters<CurState extends State> extends BaseRegExp<CurState> {
       Assert<IsHexChar, HexCharErr> &
       Assert<IsProperLength, ImproperLengthErr>
   ) => {
-    return new TypedRegExp(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
+    return new Reggex(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
   }
 
   static create() {
