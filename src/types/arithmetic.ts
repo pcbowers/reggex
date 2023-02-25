@@ -3,7 +3,7 @@
  * @param T The array to get the length of
  * @returns The length of the array
  */
-export type Length<T extends any[]> = T extends { length: infer L }
+export type Length<T extends unknown[]> = T extends { length: infer L }
   ? L extends number
     ? L
     : never
@@ -15,9 +15,9 @@ export type Length<T extends any[]> = T extends { length: infer L }
  * @param T The tuple to build
  * @returns A tuple of length L
  */
-type BuildTuple<L extends number, T extends any[] = []> = T extends { length: L }
+type BuildTuple<L extends number, T extends unknown[] = []> = T extends { length: L }
   ? T
-  : BuildTuple<L, [...T, any]>
+  : BuildTuple<L, [...T, unknown]>
 
 /**
  * Add A and B. Defaults to 0 if both are not numbers. Currently does not support negative numbers

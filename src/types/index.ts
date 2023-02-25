@@ -35,7 +35,7 @@ export type Letter = LowerCaseLetter | UpperCaseLetter
  * A type that helps unwrap deeply nested types
  */
 export type Expand<T> = T extends infer O
-  ? O extends Record<any, any>
+  ? O extends Record<string | number | symbol, unknown>
     ? { [K in keyof O]: O[K] }
     : O
   : never
@@ -43,7 +43,8 @@ export type Expand<T> = T extends infer O
 /**
  * A helper type to extract the return type of a method
  */
-export type RegularMethod<T> = T extends (...args: any[]) => any ? ReturnType<T> : never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RegularMethod<T> = T extends (...args: unknown[]) => any ? ReturnType<T> : never
 
 /**
  * A helper type to extract the return type of a getter method

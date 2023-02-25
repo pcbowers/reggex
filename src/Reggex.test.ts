@@ -26,7 +26,7 @@ const domain = Inputs.extend(
       return new Reggex(
         this.merge({
           curExp: `${this.state.curExp}\\b${domain}\\b`,
-          groups: [...this.state.groups, "test"],
+          groups: [...this.state.groups, "test"]
         })
       )
     }
@@ -51,6 +51,7 @@ describe("Reggex", () => {
   describe("and", () => {
     it("starts a new expression", () => {
       const test = match.anyChar.and.wordChar.and.anyChar
+
       expect(test.getState()).toEqual(createState({ curExp: ".", prvExp: ".\\w" }))
     })
   })
@@ -58,6 +59,7 @@ describe("Reggex", () => {
   describe("extend", () => {
     it("allows extension via get methods", () => {
       const test = match.gmailDomain.and.gmailDomain
+
       expect(test.getState()).toEqual(
         createState({ curExp: "\\bgmail.com\\b", prvExp: "\\bgmail.com\\b" })
       )
@@ -65,6 +67,7 @@ describe("Reggex", () => {
 
     it("allows extension via regular methods", () => {
       const test = match.domain("test.com").and.domain("bro.com")
+
       expect(test.getState()).toEqual(
         createState({ curExp: "\\bbro.com\\b", prvExp: "\\btest.com\\b", groups: ["test", "test"] })
       )
@@ -72,6 +75,7 @@ describe("Reggex", () => {
 
     it("allows extension via primitive values", () => {
       const test = match.anyChar.and.helloString
+
       expect(test).toEqual("hello")
     })
   })

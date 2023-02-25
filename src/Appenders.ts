@@ -10,7 +10,7 @@ import {
   OfLength,
   StartsWith,
   State,
-  NamespaceState,
+  NamespaceState
 } from "@types"
 import { createState, DEFAULT_MESSAGE } from "@utils"
 import { BaseReggex } from "./BaseReggex"
@@ -42,7 +42,7 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
         group
           .replace(matchGroup, `(?<${prefix}$1${suffix}>`)
           .replace(matchRef, `\\k<${prefix}$1${suffix}>`)
-      ),
+      )
     } as NamespaceState<TState, Prefix, Suffix>
   }
 
@@ -79,7 +79,7 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
         curExp: `(?:${namespacedState.prvExp}${namespacedState.curExp})`,
         prvExp: `${this.state.prvExp}${this.state.curExp}`,
         names: [...this.state.names, ...namespacedState.names],
-        groups: [...this.state.groups, ...namespacedState.groups],
+        groups: [...this.state.groups, ...namespacedState.groups]
       })
     )
   }
@@ -119,7 +119,7 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
         curExp: group,
         prvExp: `${this.state.prvExp}${this.state.curExp}`,
         names: [...this.state.names, ...namespacedState.names],
-        groups: [...this.state.groups, group, ...namespacedState.groups],
+        groups: [...this.state.groups, group, ...namespacedState.groups]
       })
     )
   }
@@ -175,7 +175,7 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
         curExp: group,
         prvExp: `${this.state.prvExp}${this.state.curExp}`,
         names: [...this.state.names, name, ...namespacedState.names],
-        groups: [...this.state.groups, group, ...namespacedState.groups],
+        groups: [...this.state.groups, group, ...namespacedState.groups]
       })
     )
   }
@@ -213,7 +213,7 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
         curExp: namespacedState.curExp,
         prvExp: `${this.state.prvExp}${this.state.curExp}${namespacedState.prvExp}`,
         names: [...this.state.names, ...namespacedState.names],
-        groups: [...this.state.groups, ...namespacedState.groups],
+        groups: [...this.state.groups, ...namespacedState.groups]
       })
     )
   }

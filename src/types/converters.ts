@@ -52,7 +52,7 @@ export type Join<Tuple, Delimiter extends string = " | "> = Tuple extends [
  * @param U The tuple to convert
  * @returns The intersection of T and U
  */
-export type TupleToIntersection<T, U extends any[]> = U extends [infer First, ...infer Rest]
+export type TupleToIntersection<T, U extends unknown[]> = U extends [infer First, ...infer Rest]
   ? T & TupleToIntersection<First, Rest>
   : T
 
