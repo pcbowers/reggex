@@ -7,9 +7,9 @@ on:
 
 jobs:
   lint:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
         node-version: [16.x, 18.x]
 
     steps:
@@ -33,9 +33,9 @@ jobs:
         run: pnpm run lint
 
   test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
         node-version: [16.x, 18.x]
 
     steps:
@@ -83,9 +83,9 @@ jobs:
         if: success() || failure()
 
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
         node-version: [16.x, 18.x]
 
     steps:
