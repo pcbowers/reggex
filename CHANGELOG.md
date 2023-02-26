@@ -1,5 +1,11 @@
 # reggex
 
+## 0.2.4
+
+### Patch Changes
+
+- 23c31c1: Add badges and logo to README
+
 ## 0.2.3
 
 ### Patch Changes
