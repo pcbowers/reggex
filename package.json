@@ -4,6 +4,7 @@
   "description": "A TypeScript library that provides a programmatic and human readable way to create strongly-typed regular expressions",
   "author": "P. Christopher Bowers",
   "license": "MIT",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/pcbowers/reggex.git"
