@@ -1,4 +1,16 @@
-import { Expand, InferState, Primitive, State, StateMerger, TupleToIntersection } from "@types"
+import {
+  Assert,
+  Expand,
+  Flag,
+  InferState,
+  Join,
+  Primitive,
+  State,
+  StateMerger,
+  TupleToIntersection,
+  TypedRegExp
+} from "@types"
+import { BaseReggex } from "BaseReggex"
 
 export const DEFAULT_MESSAGE = "⚡ Ready for RegExp conversion!" as const
 
@@ -126,4 +138,29 @@ export function assign<T extends Record<any, any>, U extends Record<any, any>[]>
 
   // Return the target object
   return target as TupleToIntersection<T, U>
+}
+
+/**
+ * Compile a Reggex into a TypedRegExp. If used with the transformer plugin, all uses of this function will be replaced with the compiled Reggex (assuming the function doesn't have any side effects)
+ * @param func A function that returns a Reggex
+ * @param flags The flags to compile the Reggex with
+ * @returns The compiled TypedRegExp
+ */
+export function compileReggex<
+  // parameter types
+  ExtenderFunction extends (...args: unknown[]) => Return,
+  Return extends BaseReggex<TState> = ReturnType<ExtenderFunction>,
+  TState extends State = InferState<Return extends BaseReggex<infer S> ? S : State>,
+  // assertion types
+  IsValidType extends boolean = TState["msg"] extends typeof DEFAULT_MESSAGE ? true : false,
+  InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
+  // return types
+  Flags extends Flag[] = [],
+  FinalFlags extends string = Join<Flags, "", "", false>,
+  FinalExpression extends string = `/${TState["prvExp"]}${TState["curExp"]}/${FinalFlags}`
+>(
+  func: ExtenderFunction & Assert<IsValidType, InvalidTypeErr>,
+  flags?: [...Flags]
+): TypedRegExp<FinalExpression> {
+  return func().compile(flags)
 }

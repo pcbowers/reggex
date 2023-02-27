@@ -10,17 +10,17 @@ describe("Appenders", () => {
           .namedCapture("test")
           .and.group(
             match.anyChar.and.wordChar.groupedAs.namedCapture("test").and.backreferenceTo("test"),
-            { namespace: "prefix-", asPrefix: true }
+            { namespace: "pre", asPrefix: true }
           ),
-        { namespace: "-suffix", asPrefix: false }
+        { namespace: "suf", asPrefix: false }
       )
 
       expect(test.getState()).toMatchObject(
         createState({
-          curExp: "(?:(?<test-suffix>.)(?:.(?<prefix-test-suffix>\\w)\\k<prefix-test-suffix>))",
+          curExp: "(?:(?<testsuf>.)(?:.(?<pretestsuf>\\w)\\k<pretestsuf>))",
           prvExp: "",
-          names: ["test-suffix", "prefix-test-suffix"],
-          groups: ["(?<test-suffix>.)", "(?<prefix-test-suffix>\\w)"]
+          names: ["testsuf", "pretestsuf"],
+          groups: ["(?<testsuf>.)", "(?<pretestsuf>\\w)"]
         })
       )
     })
@@ -30,22 +30,18 @@ describe("Appenders", () => {
     it("works", () => {
       const test = capture(
         capture(match.anyChar.and.wordChar.as.namedCapture("test"), {
-          namespace: "prefix-",
+          namespace: "pre",
           asPrefix: true
         }),
-        { namespace: "-suffix", asPrefix: false }
+        { namespace: "suf", asPrefix: false }
       )
 
       expect(test.getState()).toMatchObject(
         createState({
-          curExp: "((.(?<prefix-test-suffix>\\w)))",
+          curExp: "((.(?<pretestsuf>\\w)))",
           prvExp: "",
-          names: ["prefix-test-suffix"],
-          groups: [
-            "((.(?<prefix-test-suffix>\\w)))",
-            "(.(?<prefix-test-suffix>\\w))",
-            "(?<prefix-test-suffix>\\w)"
-          ]
+          names: ["pretestsuf"],
+          groups: ["((.(?<pretestsuf>\\w)))", "(.(?<pretestsuf>\\w))", "(?<pretestsuf>\\w)"]
         })
       )
     })
@@ -58,20 +54,20 @@ describe("Appenders", () => {
         namedCapture(
           "test",
           match.anyChar.and.wordChar.thatRepeats.greedily.oneOrMore.groupedAs.namedCapture("bro"),
-          { namespace: "prefix-", asPrefix: true }
+          { namespace: "pre", asPrefix: true }
         ).and.anyChar.as.capture.and.group(match.anyChar.and.wordChar),
-        { namespace: "-suffix", asPrefix: false }
+        { namespace: "suf", asPrefix: false }
       )
 
       expect(test.getState()).toMatchObject(
         createState({
-          curExp: "(?<test>(?<test-suffix>.(?<prefix-bro-suffix>\\w+))(.)(?:.\\w))",
+          curExp: "(?<test>(?<testsuf>.(?<prebrosuf>\\w+))(.)(?:.\\w))",
           prvExp: "",
-          names: ["test", "test-suffix", "prefix-bro-suffix"],
+          names: ["test", "testsuf", "prebrosuf"],
           groups: [
-            "(?<test>(?<test-suffix>.(?<prefix-bro-suffix>\\w+))(.)(?:.\\w))",
-            "(?<test-suffix>.(?<prefix-bro-suffix>\\w+))",
-            "(?<prefix-bro-suffix>\\w+)",
+            "(?<test>(?<testsuf>.(?<prebrosuf>\\w+))(.)(?:.\\w))",
+            "(?<testsuf>.(?<prebrosuf>\\w+))",
+            "(?<prebrosuf>\\w+)",
             "(.)"
           ]
         })
@@ -85,20 +81,20 @@ describe("Appenders", () => {
         .namedCapture("test")
         .and.append(match.anyChar)
         .and.append(match.anyChar.as.namedCapture("test"), {
-          namespace: "prefix-",
+          namespace: "pre",
           asPrefix: true
         })
         .and.append(match.anyChar.as.namedCapture("test"), {
-          namespace: "-suffix",
+          namespace: "suf",
           asPrefix: false
         })
 
       expect(test.getState()).toMatchObject(
         createState({
-          curExp: "(?<test-suffix>.)",
-          prvExp: "(?<test>.).(?<prefix-test>.)",
-          names: ["test", "prefix-test", "test-suffix"],
-          groups: ["(?<test>.)", "(?<prefix-test>.)", "(?<test-suffix>.)"]
+          curExp: "(?<testsuf>.)",
+          prvExp: "(?<test>.).(?<pretest>.)",
+          names: ["test", "pretest", "testsuf"],
+          groups: ["(?<test>.)", "(?<pretest>.)", "(?<testsuf>.)"]
         })
       )
     })

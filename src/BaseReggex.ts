@@ -1,5 +1,5 @@
+import { Flag, InferState, Join, State, TypedRegExp } from "@types"
 import { merger } from "@utils"
-import { InferState, State } from "./types/state"
 
 export class BaseReggex<CurState extends State> {
   /**
@@ -46,4 +46,22 @@ export class BaseReggex<CurState extends State> {
 
     return value
   }
+
+  compile<
+    Flags extends Flag[] = [],
+    FinalFlags extends string = Join<Flags, "", "", false>,
+    FinalExpression extends string = `/${CurState["prvExp"]}${CurState["curExp"]}/${FinalFlags}`
+  >(flags?: [...Flags]): TypedRegExp<FinalExpression> {
+    const exp = `${this.state.prvExp}${this.state.curExp}`
+    const flagsString = (flags ?? []).join("")
+    return new RegExp(exp, flagsString) as TypedRegExp<FinalExpression>
+  }
 }
+
+export const global = "g"
+export const ignoreCase = "i"
+export const multiline = "m"
+export const dotAll = "s"
+export const unicode = "u"
+export const sticky = "y"
+export const hasIndices = "d"

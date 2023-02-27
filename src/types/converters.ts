@@ -4,16 +4,22 @@ import { Primitive } from "@types"
  * Join an array of primitives into a string
  * @param Primitives The array of primitives to join
  * @param Delimiter The delimiter to use between each primitive
+ * @param WrapStrings Whether or not to wrap strings in single quotes
  * @returns The joined string
  */
 type JoinPrimitives<
   Primitives extends Primitive[],
-  Delimiter extends string = " | "
+  Delimiter extends string = " | ",
+  WrapStrings extends boolean = true
 > = Primitives extends []
   ? ""
   : Primitives extends [infer Last]
   ? Last extends string
-    ? `'${Last}'`
+    ? WrapStrings extends true
+      ? `'${Last}'`
+      : Last extends Primitive
+      ? `${Last}`
+      : never
     : Last extends Primitive
     ? `${Last}`
     : never
@@ -21,9 +27,13 @@ type JoinPrimitives<
   ? Rest extends Primitive[]
     ? Primitives[0] extends infer Last
       ? Last extends string
-        ? `'${Last}'${Delimiter}${JoinPrimitives<Rest, Delimiter>}`
+        ? WrapStrings extends true
+          ? `'${Last}'${Delimiter}${JoinPrimitives<Rest, Delimiter, WrapStrings>}`
+          : Last extends Primitive
+          ? `${Last}${Delimiter}${JoinPrimitives<Rest, Delimiter, WrapStrings>}`
+          : never
         : Last extends Primitive
-        ? `${Last}${Delimiter}${JoinPrimitives<Rest, Delimiter>}`
+        ? `${Last}${Delimiter}${JoinPrimitives<Rest, Delimiter, WrapStrings>}`
         : never
       : never
     : never
@@ -33,18 +43,22 @@ type JoinPrimitives<
  * Join an array of primitives into a string
  * @param Tuple The tuple to join
  * @param Delimiter The delimiter to use between each primitive
+ * @param OnEmpty The string to return if the array is not an array of primitives or is empty
+ * @param WrapStrings Whether or not to wrap strings in single quotes
  * @returns The joined string or "N/A" if the array is not an array of primitives or is empty
  */
-export type Join<Tuple, Delimiter extends string = " | "> = Tuple extends [
-  infer First,
-  ...infer Rest
-]
+export type Join<
+  Tuple,
+  Delimiter extends string = " | ",
+  OnEmpty extends string = "N/A",
+  WrapStrings extends boolean = true
+> = Tuple extends [infer First, ...infer Rest]
   ? First extends Primitive
     ? Rest extends Primitive[]
-      ? JoinPrimitives<[First, ...Rest], Delimiter>
-      : "N/A"
-    : "N/A"
-  : "N/A"
+      ? JoinPrimitives<[First, ...Rest], Delimiter, WrapStrings>
+      : OnEmpty
+    : OnEmpty
+  : OnEmpty
 
 /**
  * Convert a tuple to an intersection

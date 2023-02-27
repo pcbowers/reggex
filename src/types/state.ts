@@ -155,3 +155,11 @@ export type NamespaceState<
     ">"
   >
 >
+
+declare const expressionSymbol: unique symbol
+/**
+ * A typed regular expression
+ */
+export type TypedRegExp<Expression extends string> = RegExp & {
+  [expressionSymbol]: Expression
+}

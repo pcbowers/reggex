@@ -8,6 +8,7 @@ export * from "./Appenders"
 export * from "./Inputs"
 export * from "./Quantifiers"
 export * from "./Reggex"
+export * from "./BaseReggex"
 
 export const anyChar = Inputs.create().anyChar
 export const controlChar = Inputs.create().controlChar

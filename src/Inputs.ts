@@ -1,12 +1,10 @@
-import { Assert, HexChar, Letter, OfLength, State, StateMerger } from "@types"
+import { Assert, HexChar, Letter, OfLength, State } from "@types"
 import { createState } from "@utils"
 import { BaseReggex } from "./BaseReggex"
 import { Reggex } from "./Reggex"
 
 export class Inputs<CurState extends State> extends BaseReggex<CurState> {
-  get anyChar(): Reggex<
-    StateMerger<CurState, State<never, `${CurState["curExp"]}.`, never, never, never>>
-  > {
+  get anyChar() {
     return new Reggex(this.merge({ curExp: `${this.state.curExp}.` }))
   }
 

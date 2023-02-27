@@ -1,5 +1,6 @@
-import { assign, createState, merger } from "@utils"
+import { assign, compileReggex, createState, merger } from "@utils"
 import { describe, it, expect } from "vitest"
+import { global, match } from "../index"
 
 const method = Symbol("method")
 const property = Symbol("property")
@@ -160,6 +161,29 @@ describe("utils", () => {
           }
         })
       )
+    })
+  })
+
+  describe("compileReggex", () => {
+    it("compiles a regex and its flags", () => {
+      const test = compileReggex(() => {
+        const test = "test"
+        const anyChar = match.anyChar
+        return match.anyChar.as
+          .namedCapture(test)
+          .and.append(anyChar)
+          .and.namedCapture(`${test}a` as const, anyChar.as.namedCapture(test), {
+            namespace: "pre",
+            asPrefix: true
+          })
+          .and.group(anyChar.as.namedCapture(test), {
+            namespace: "suf",
+            asPrefix: false
+          })
+          .and.backreferenceTo("testsuf")
+      }, [global])
+
+      expect(test).toEqual(/(?<test>.).(?<testa>(?<pretest>.))(?:(?<testsuf>.))\k<testsuf>/g)
     })
   })
 })

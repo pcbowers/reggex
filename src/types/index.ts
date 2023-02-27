@@ -50,3 +50,9 @@ export type RegularMethod<T> = T extends (...args: unknown[]) => any ? ReturnTyp
  * A helper type to extract the return type of a getter method
  */
 export type GetMethod<T> = ReturnType<RegularMethod<T>>
+
+// prettier-ignore
+/**
+ * Flags for a regular expression
+ */
+export type Flag = "g" | "i" | "m" | "s" | "u" | "y" | "d"
