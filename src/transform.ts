@@ -2,7 +2,7 @@ import { Node, walk } from "estree-walker"
 import MagicString from "magic-string"
 import { findStaticImports, parseStaticImport } from "mlly"
 import { createUnplugin } from "unplugin"
-import { Context, Script } from "vm"
+import { Context, createContext, runInContext } from "vm"
 import * as reggex from "./index"
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -65,6 +65,7 @@ export const ReggexTransformerPlugin = createUnplugin(
           // default exports are ignored
         }
 
+        const nodeContext = createContext(context)
         const s = new MagicString(code)
 
         walk(this.parse(code) as Node, {
@@ -89,8 +90,7 @@ export const ReggexTransformerPlugin = createUnplugin(
 
             try {
               // evaluate the code and replace the call with the result
-              const script = new Script(code.slice(start, end))
-              const value = script.runInNewContext(context).toString()
+              const value = runInContext(code.slice(start, end), nodeContext).toString()
               s.overwrite(start, end, value)
             } catch {
               // silently ignore if the evaluation failed because Reggex can be evaluated at runtime
@@ -99,14 +99,12 @@ export const ReggexTransformerPlugin = createUnplugin(
         })
 
         // only return the transformed code if it has changed
-        if (s.hasChanged()) {
-          return {
-            code: s.toString(),
-            map: s.generateMap({ includeContent: true, source: id })
-          }
-        }
+        if (!s.hasChanged()) return
 
-        return
+        return {
+          code: s.toString(),
+          map: s.generateMap({ includeContent: true, source: id })
+        }
       }
     }
   }

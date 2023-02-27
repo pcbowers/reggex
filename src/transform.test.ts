@@ -51,12 +51,12 @@ describe("transformer", () => {
   })
 
   it("handles namespaced imports", () => {
-    const expectedImports = `import * as reggex from "reggex"\n`
+    const expectedImports = `import * as reggex from "reggex"\nimport * as reggex2 from "reggex"\n`
     const test =
       expectedImports +
       testTransformNoImport
         .replaceAll("match", "reggex.match")
-        .replaceAll("compileReggex", "reggex.compileReggex")
+        .replaceAll("compileReggex", "reggex2.compileReggex")
 
     expect(transform(test)).toEqual(expectedImports + expectedTransformNoImport)
   })
