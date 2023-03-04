@@ -74,13 +74,14 @@ export const ReggexTransformerPlugin = createUnplugin(
             if (node.type !== "CallExpression") return
 
             // only transform calls to compileReggex or if it's a namespaced import
-            if (!wrappers.includes((node.callee as any)?.name)) {
+            // @ts-expect-error - this is a hack to get around the fact that the types for estree-walker are finnicky here
+            if (!wrappers.includes(node.callee.name)) {
               if (
                 node.callee.type !== "MemberExpression" ||
                 node.callee.object.type !== "Identifier" ||
                 node.callee.property.type !== "Identifier" ||
                 node.callee.property.name !== "compileReggex" ||
-                !namespaces.includes((node.callee as any)?.object?.name)
+                !namespaces.includes(node.callee.object.name)
               )
                 return
             }

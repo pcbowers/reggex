@@ -1,13 +1,11 @@
 import {
-  Assert,
-  Expand,
   Flag,
   InferState,
   Join,
+  Prettify,
   Primitive,
   State,
   StateMerger,
-  TupleToIntersection,
   TypedRegExp
 } from "@types"
 import { BaseReggex } from "BaseReggex"
@@ -27,7 +25,7 @@ export function createState<
   Groups extends string[] = []
 >(
   state?: Partial<State<Msg, CurExp, PrvExp, Names, Groups>>
-): InferState<Expand<State<Msg, CurExp, PrvExp, Names, Groups>>> {
+): InferState<Prettify<State<Msg, CurExp, PrvExp, Names, Groups>>> {
   return {
     msg: (state?.msg ?? DEFAULT_MESSAGE) as Msg,
     curExp: (state?.curExp ?? "") as CurExp,
@@ -62,6 +60,10 @@ export function merger<CurState extends State>(curState: InferState<CurState>) {
     } as StateMerger<CurState, NewState>
   }
 }
+
+type TupleToIntersection<T, U extends unknown[]> = U extends [infer First, ...infer Rest]
+  ? T & TupleToIntersection<First, Rest>
+  : T
 
 /**
  * A better Object.assign that merges the prototype properties while keeping the enumerable property descriptors
@@ -151,16 +153,10 @@ export function compileReggex<
   ExtenderFunction extends (...args: unknown[]) => Return,
   Return extends BaseReggex<TState> = ReturnType<ExtenderFunction>,
   TState extends State = InferState<Return extends BaseReggex<infer S> ? S : State>,
-  // assertion types
-  IsValidType extends boolean = TState["msg"] extends typeof DEFAULT_MESSAGE ? true : false,
-  InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
   // return types
   Flags extends Flag[] = [],
   FinalFlags extends string = Join<Flags, "", "", false>,
   FinalExpression extends string = `/${TState["prvExp"]}${TState["curExp"]}/${FinalFlags}`
->(
-  func: ExtenderFunction & Assert<IsValidType, InvalidTypeErr>,
-  flags?: [...Flags]
-): TypedRegExp<FinalExpression> {
+>(func: ExtenderFunction, flags?: [...Flags]): TypedRegExp<FinalExpression> {
   return func().compile(flags)
 }

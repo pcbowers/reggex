@@ -1,7 +1,7 @@
-import { Flag, InferState, Join, State, TypedRegExp } from "@types"
+import { Flag, InferState, Join, State as S, TypedRegExp } from "@types"
 import { merger } from "@utils"
 
-export class BaseReggex<CurState extends State> {
+export class BaseReggex<CurState extends S> {
   /**
    * Merge the current state with the new state
    * @param newState The new state to merge with the default state

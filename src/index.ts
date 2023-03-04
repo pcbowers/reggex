@@ -3,12 +3,12 @@ import { Inputs } from "./Inputs"
 
 export * from "@types"
 export * from "@utils"
-export * from "./Groups"
 export * from "./Appenders"
+export * from "./BaseReggex"
+export * from "./Groups"
 export * from "./Inputs"
 export * from "./Quantifiers"
 export * from "./Reggex"
-export * from "./BaseReggex"
 
 export const anyChar = Inputs.create().anyChar
 export const controlChar = Inputs.create().controlChar

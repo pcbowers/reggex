@@ -1,37 +1,5 @@
-import { Expand, Length, MapAdd, MapWrap, MapWrapSearch, Primitive, WrapSearch } from "@types"
+import { Primitive } from "@types"
 import { DEFAULT_MESSAGE } from "@utils"
-
-/**
- * Merge two tuples of primitives
- * @param T First tuple
- * @param S Second tuple
- * @returns S if defined, T if defined, otherwise never
- */
-type MergePrimitiveTuple<T, S> = [S] extends [never]
-  ? T extends Primitive[]
-    ? [...T]
-    : never
-  : S extends Primitive[]
-  ? [...S]
-  : T extends Primitive[]
-  ? [...T]
-  : never
-
-/**
- * Merge two primitives
- * @param T First primitive
- * @param S Second primitive
- * @returns S if defined, T if defined, otherwise never
- */
-type MergePrimitive<T, S> = [S] extends [never]
-  ? T extends Primitive
-    ? T
-    : never
-  : S extends Primitive
-  ? S
-  : T extends Primitive
-  ? T
-  : never
 
 /**
  * The State of a Reggex
@@ -79,17 +47,37 @@ export interface InferState<
 }
 
 /**
- * The options for an Appender
- * @param Namespace The namespace to use for the appender
- * @param AsPrefix Whether or not to use the namespace as a prefix or a suffix
+ * Merge two tuples of primitives
+ * @param T The first tuple
+ * @param S The second tuple
+ * @returns S if defined, T if defined, otherwise never
  */
-export interface AppenderOpts<
-  Namespace extends string = string,
-  AsPrefix extends boolean = boolean
-> {
-  namespace: Namespace
-  asPrefix: AsPrefix
-}
+export type MergePrimitiveTuple<T, S> = [S] extends [never]
+  ? T extends Primitive[]
+    ? [...T]
+    : never
+  : S extends Primitive[]
+  ? [...S]
+  : never
+
+/**
+ * Merge two primitives
+ * @param T The first primitive
+ * @param S The second primitive
+ * @returns S if defined, T if defined, otherwise never
+ */
+export type MergePrimitive<T, S> = [S] extends [never]
+  ? T extends Primitive
+    ? T
+    : never
+  : S extends Primitive
+  ? S
+  : never
+
+/**
+ * Prettify a type
+ */
+export type Prettify<T> = { [K in keyof T]: T[K] } & {}
 
 /**
  * Merge two states
@@ -97,8 +85,8 @@ export interface AppenderOpts<
  * @param NewState New state
  * @returns NewState if defined, CurState if defined, otherwise never. If NewState["msg"] is never, then the default "msg" is used.
  */
-export type StateMerger<CurState extends State, NewState extends State> = InferState<
-  Expand<{
+export type StateMerger<CurState extends State, NewState extends State> = Prettify<
+  InferState<{
     [Key in keyof State]: State[Key] extends Primitive[]
       ? [...MergePrimitiveTuple<CurState[Key], NewState[Key]>]
       : Key extends "msg"
@@ -110,14 +98,21 @@ export type StateMerger<CurState extends State, NewState extends State> = InferS
 >
 
 /**
- * Get the indices of a tuple
- * @param T Tuple
- * @returns Indices of T
+ * A helper type which is useful when using the never type as a placeholder
  */
-type TupleIndices<T> = T extends [Primitive, ...infer Rest]
+export type _ = never
+
+/**
+ * Get the indices of a tuple
+ * @param T The tuple
+ * @param AddOne Whether or not to add one to the indices
+ */
+export type TupleIndices<T, AddOne extends boolean = true> = T extends [Primitive, ...infer Rest]
   ? Rest extends Primitive[]
-    ? [...TupleIndices<Rest>, Length<Rest>]
-    : [0]
+    ? AddOne extends true
+      ? [...TupleIndices<Rest, AddOne>, [...Rest, unknown]["length"]]
+      : [...TupleIndices<Rest, AddOne>, Rest["length"]]
+    : []
   : []
 
 /**
@@ -126,10 +121,81 @@ type TupleIndices<T> = T extends [Primitive, ...infer Rest]
  * @param Groups Array of groups
  * @returns Array of group names along with their numerical references
  */
-export type GroupReferences<Names extends Primitive[], Groups extends Primitive[]> = [
+export type ResolveRefs<Names extends Primitive[], Groups extends Primitive[]> = [
   ...Names,
-  ...MapAdd<TupleIndices<Groups>, 1>
+  ...TupleIndices<Groups>
 ]
+
+/**
+ * Search for a string and wrap it in a prefix and suffix
+ * @param Input The string to search
+ * @param Prefix The prefix to use
+ * @param Suffix The suffix to use
+ * @param PreSearch The string to search for before the string to wrap
+ * @param PostSearch The string to search for after the string to wrap
+ */
+export type WrapSearch<
+  Input,
+  Prefix extends Primitive,
+  Suffix extends Primitive,
+  PreSearch extends Primitive,
+  PostSearch extends Primitive
+> = Input extends `${infer Head}${PreSearch}${infer Middle}${PostSearch}${infer Tail}`
+  ? Head extends `${string}\\`
+    ? Input extends Primitive
+      ? Input
+      : never
+    : `${Head}${PreSearch}${Prefix}${Middle}${Suffix}${PostSearch}${WrapSearch<
+        Tail,
+        Prefix,
+        Suffix,
+        PreSearch,
+        PostSearch
+      >}`
+  : Input extends Primitive
+  ? Input
+  : never
+
+/**
+ * Map over a tuple and wrap all instances of a search string in a prefix and suffix
+ * @param T The tuple to map over
+ * @param Prefix The prefix to use
+ * @param Suffix The suffix to use
+ * @param PreSearch The string to search for before the string to wrap
+ * @param PostSearch The string to search for after the string to wrap
+ */
+export type MapWrapSearch<
+  T,
+  Prefix extends Primitive,
+  Suffix extends Primitive,
+  PreSearch extends Primitive,
+  PostSearch extends Primitive
+> = T extends [infer First, ...infer Rest]
+  ? [
+      WrapSearch<First, Prefix, Suffix, PreSearch, PostSearch>,
+      ...MapWrapSearch<Rest, Prefix, Suffix, PreSearch, PostSearch>
+    ]
+  : []
+
+/**
+ * Map over a tuple and wrap all instances in a prefix and suffix
+ * @param T The tuple to map over
+ * @param Prefix The prefix to use
+ * @param Suffix The suffix to use
+ */
+export type MapWrap<
+  T extends Primitive[],
+  Prefix extends Primitive,
+  Suffix extends Primitive
+> = T extends [infer First, ...infer Rest]
+  ? First extends Primitive
+    ? Rest extends Primitive[]
+      ? [`${Prefix}${First}${Suffix}`, ...MapWrap<Rest, Prefix, Suffix>]
+      : [`${Prefix}${First}${Suffix}`]
+    : Rest extends Primitive[]
+    ? [...MapWrap<Rest, Prefix, Suffix>]
+    : []
+  : []
 
 /**
  *  Namespace named capture groups with a prefix or suffix
@@ -156,10 +222,30 @@ export type NamespaceState<
   >
 >
 
+/**
+ * The options for an Appender
+ * @param Namespace The namespace to use for the appender
+ * @param AsPrefix Whether or not to use the namespace as a prefix or a suffix
+ */
+export interface AppenderOpts<
+  Namespace extends string = string,
+  AsPrefix extends boolean = boolean
+> {
+  namespace: Namespace
+  asPrefix: AsPrefix
+}
+
 declare const expressionSymbol: unique symbol
+
 /**
  * A typed regular expression
+ * @param Expression The regular expression
  */
 export type TypedRegExp<Expression extends string> = RegExp & {
   [expressionSymbol]: Expression
 }
+
+/**
+ * Flags for a regular expression
+ */
+export type Flag = "g" | "i" | "m" | "s" | "u" | "y" | "d"

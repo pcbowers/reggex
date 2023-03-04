@@ -1,56 +1,49 @@
-import { Assert, HexChar, Letter, OfLength, State } from "@types"
+import {
+  IsValidControlChar,
+  IsValidHexCode,
+  IsValidUnicodeChar,
+  OfLength,
+  Prettify,
+  State as S,
+  StateMerger,
+  _
+} from "@types"
 import { createState } from "@utils"
 import { BaseReggex } from "./BaseReggex"
 import { Reggex } from "./Reggex"
 
-export class Inputs<CurState extends State> extends BaseReggex<CurState> {
-  get anyChar() {
+export class Inputs<CurState extends S> extends BaseReggex<CurState> {
+  get anyChar(): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}.`, _, _, _>>> {
     return new Reggex(this.merge({ curExp: `${this.state.curExp}.` }))
   }
 
-  get wordChar() {
+  get wordChar(): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}\\w`, _, _, _>>> {
     return new Reggex(this.merge({ curExp: `${this.state.curExp}\\w` }))
   }
 
-  controlChar = <
-    ControlChar extends string,
-    IsLetter = OfLength<ControlChar, 1, Letter>,
-    NotLetterErr = `❌ The control character '${ControlChar}' must be a single letter from A-Z`
-  >(
-    controlChar: ControlChar & Assert<IsLetter, NotLetterErr>
-  ) => {
+  controlChar = <ControlChar extends string>(
+    controlChar: ControlChar & IsValidControlChar<ControlChar>
+  ): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}\\c${ControlChar}`, _, _, _>>> => {
     return new Reggex(this.merge({ curExp: `${this.state.curExp}\\c${controlChar}` }))
   }
 
   hexCode = <
     HexCode extends string,
-    IsHexChar = OfLength<HexCode, number, HexChar>,
-    HexCharErr = `❌ The HexCode '${HexCode}' must only contain valid hexidecimal digits`,
-    IsProperLength = OfLength<HexCode, 2 | 4>,
-    ImproperLengthErr = `❌ The HexCode '${HexCode}' must be a length of 2 or 4`,
     CharType extends string = OfLength<HexCode, 2> extends true ? "\\x" : "\\u"
   >(
-    hexChars: HexCode & Assert<IsHexChar, HexCharErr> & Assert<IsProperLength, ImproperLengthErr>
-  ) => {
+    hexChars: HexCode & IsValidHexCode<HexCode>
+  ): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}${CharType}${HexCode}`, _, _, _>>> => {
     const charType = (hexChars.length === 2 ? "\\x" : "\\u") as CharType
     return new Reggex(this.merge({ curExp: `${this.state.curExp}${charType}${hexChars}` }))
   }
 
-  unicodeChar = <
-    UnicodeChar extends string,
-    IsHexChar = OfLength<UnicodeChar, number, HexChar>,
-    HexCharErr = `❌ The UnicodeChar '${UnicodeChar}' must only contain valid hexidecimal digits`,
-    IsProperLength = OfLength<UnicodeChar, 4 | 5>,
-    ImproperLengthErr = `❌ The UnicodeChar '${UnicodeChar}' must be a length of 4 or 5`
-  >(
-    unicodeChar: UnicodeChar &
-      Assert<IsHexChar, HexCharErr> &
-      Assert<IsProperLength, ImproperLengthErr>
-  ) => {
+  unicodeChar = <UnicodeChar extends string>(
+    unicodeChar: UnicodeChar & IsValidUnicodeChar<UnicodeChar>
+  ): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}\\u{${UnicodeChar}}`, _, _, _>>> => {
     return new Reggex(this.merge({ curExp: `${this.state.curExp}\\u{${unicodeChar}}` }))
   }
 
-  static create() {
+  static create(): Inputs<Prettify<S<"⏳ Select Input...", "", "", [], []>>> {
     const state = createState({ msg: "⏳ Select Input..." })
     return new Inputs(state)
   }

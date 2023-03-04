@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest"
 import { parse } from "acorn"
+import { describe, expect, it } from "vitest"
 import { ReggexTransformerPlugin } from "./transform"
 
 const testTransform = `

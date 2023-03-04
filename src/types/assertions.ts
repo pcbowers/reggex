@@ -1,119 +1,174 @@
-import { Add, Primitive, Subtract, Replace } from "@types"
+import { Join, Primitive } from "@types"
 
-/**
- * A unique symbol used to brand error types
- */
+export type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+export type HexChar = Digit | "a" | "b" | "c" | "d" | "e" | "f" | "A" | "B" | "C" | "D" | "E" | "F"
+// prettier-ignore
+export type LowerCaseLetter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+// prettier-ignore
+export type UpperCaseLetter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+export type Letter = LowerCaseLetter | UpperCaseLetter
+export type Alphanumeric = Letter | Digit
+
 declare const brand: unique symbol
 
 /**
- * Define a unique error type that is unassignable to any other type
- * @param Token The unique token to brand the error type with
- * @returns The branded error type
+ * An error type that cannot be instantiated
+ * @param Token The token to use for the error
  */
-declare interface Err<Token> {
+export declare interface Err<Token> {
   readonly [brand]: Token
 }
 
 /**
- * Assert that a type is true, otherwise throw an error
+ * Assert that a type is true
  * @param T The type to assert
- * @param ErrorMessage The error message to throw if the assertion fails
- * @returns An empty object if the assertion is true, otherwise an error type
+ * @param ErrorMessage The error message to use if the assertion fails
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type Assert<T, ErrorMessage = "ERROR"> = T extends true ? {} : Err<Replace<ErrorMessage, T>>
+export type Assert<T, ErrorMessage = "ERROR"> = T extends true ? {} : Err<ErrorMessage>
 
 /**
- * Check if a string contains a substring a certain number of times
- * @param Str The string to check
- * @param StrToCheck The substring to check for
- * @param Times The number of times the substring should appear in the string
- * @param CurCount The current number of times the substring has appeared in the string
- * @returns Whether the string contains the substring a certain number of times
+ * Assert that a type is false
+ * @param T The type to assert
+ * @param ErrorMessage The error message to use if the assertion fails
+ */
+export type AssertNot<T, ErrorMessage = "ERROR"> = T extends false ? {} : Err<ErrorMessage>
+
+/**
+ * Check that a string contains a substring
+ * @param Value The string to check
+ * @param SubString The substring to check for
+ * @param Start The start of the string to check (optional)
  */
 export type Contains<
-  Str extends Primitive,
-  StrToCheck extends Primitive,
-  Times extends number = 1,
-  CurCount extends number = 0
-> = Str extends `${StrToCheck}${infer Rest}`
-  ? CurCount extends Subtract<Times, 1>
-    ? true
-    : Rest extends ""
-    ? false
-    : Contains<Rest, StrToCheck, Times, Add<CurCount, 1>>
-  : Str extends `${string}${infer Rest}`
-  ? Rest extends ""
-    ? false
-    : Contains<Rest, StrToCheck, Times, CurCount>
-  : Str extends StrToCheck
+  Value extends Primitive,
+  SubString extends Primitive,
+  Start extends Primitive = string
+> = Value extends `${Start}${SubString}${string}` ? true : false
+
+/**
+ * Check that a string starts with a substring
+ * @param Value The string to check
+ * @param SubString The substring to check for
+ */
+export type StartsWith<Value extends Primitive, SubString extends Primitive> = Contains<
+  Value,
+  SubString,
+  ""
+>
+
+/**
+ * Check that a tuple overlaps with a list of values
+ * @param Value The tuple to check
+ * @param Values The values to check for
+ */
+export type Overlaps<Value extends Primitive[], Values extends Primitive> = Value extends [
+  infer First,
+  ...infer Rest
+]
+  ? First extends Values
+    ? First
+    : Rest extends Primitive[]
+    ? Overlaps<Rest, Values>
+    : false
+  : false
+
+/**
+ * Check that a string is of a certain type
+ * @param T The string to check
+ * @param DesiredType The desired type of the string
+ */
+export type OfType<
+  T extends Primitive,
+  DesiredType extends Primitive = Primitive
+> = T extends `${DesiredType}${infer Rest}`
+  ? OfType<Rest, DesiredType>
+  : T extends ""
   ? true
   : false
 
 /**
- * Check if a string starts with another string
- * @param Str The string to check
- * @param StrToCheck The string to check for
- * @returns Whether the string starts with the other string
- */
-export type StartsWith<
-  Str extends Primitive,
-  StrToCheck extends Primitive
-> = Str extends `${StrToCheck}${string}` ? true : false
-
-/**
- * Check if a string is of a certain length
+ * Check that a string is of a certain length
  * @param T The string to check
  * @param DesiredLength The desired length of the string
- * @param DesiredType The desired type of the string
- * @param CurCount The current length of the string
- * @returns Whether the string is of the desired length and type
  */
 export type OfLength<
-  T extends string,
-  DesiredLength extends number = 1,
-  DesiredType extends string | number = string | number,
-  CurCount extends number = 0
-> = T extends `${DesiredType}${infer Rest}`
-  ? Rest extends ""
-    ? CurCount extends Subtract<DesiredLength, 1>
-      ? true
-      : number extends DesiredLength
-      ? true
-      : false
-    : OfLength<Rest, DesiredLength, DesiredType, Add<CurCount, 1>>
+  T extends Primitive,
+  DesiredLength extends number,
+  Acc extends unknown[] = []
+> = T extends `${string}${infer Rest}`
+  ? OfLength<Rest, DesiredLength, [...Acc, unknown]>
+  : Acc["length"] extends DesiredLength
+  ? true
   : false
 
 /**
- * Get the overlap between two arrays of primitives
- * @param First The first array of primitives
- * @param Second The second array of primitives
- * @returns The overlap between the two arrays
+ * Assert that a group name is valid
+ * @param Name The name to check
+ * @param Names The names to check against
  */
-export type Overlaps<First extends Primitive[], Second extends Primitive[]> = First extends [
-  infer Value,
-  ...infer Rest
-]
-  ? Value extends Second[number]
-    ? Rest extends Primitive[]
-      ? [Value, ...Overlaps<Rest, Second>]
-      : [Value]
-    : Rest extends Primitive[]
-    ? Overlaps<Rest, Second>
-    : []
-  : []
+export type IsValidName<
+  Name extends Primitive,
+  Names extends Primitive[],
+  Overlap extends Primitive = Overlaps<[Name], Names[number]>
+> = Assert<StartsWith<Name, Letter>, `❌ The name '${Name}' must start with a letter`> &
+  Assert<
+    OfType<Name, Alphanumeric>,
+    `❌ The name '${Name}' must only contain alphanumeric characters`
+  > &
+  AssertNot<
+    Overlap,
+    `❌ The name '${Overlap}' has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
+  >
 
 /**
- * Check if two arrays of primitives have no overlap
- * @param First The first array of primitives
- * @param Second The second array of primitives
- * @returns True if the arrays have no overlap, otherwise an array of the overlapping primitives
+ * Assert that an instance is valid
+ * @param NewNames The names to check
+ * @param Names The names to check against
  */
-export type NoOverlap<First extends Primitive[], Second extends Primitive[]> = Overlaps<
-  [...First],
-  [...Second]
-> extends infer R
-  ? R extends []
-    ? true
-    : R
-  : true
+export type IsValidInstance<
+  NewNames extends Primitive[],
+  Names extends Primitive[],
+  Overlap extends Primitive = Overlaps<NewNames, Names[number]>
+> = AssertNot<
+  Overlap,
+  `❌ The name '${Overlap}' has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
+>
+
+/**
+ * Assert that a hex code is valid
+ * @param HexCode The hex code to check
+ */
+export type IsValidHexCode<HexCode extends Primitive> = Assert<
+  OfLength<HexCode, 2 | 4>,
+  `❌ The hex code '${HexCode}' must be a length of 2 or 4`
+> &
+  Assert<
+    OfType<HexCode, HexChar>,
+    `❌ The hex code '${HexCode}' must only contain valid hexidecimal digits`
+  >
+
+/**
+ * Assert that a control character is valid
+ * @param ControlChar The control character to check
+ */
+export type IsValidControlChar<ControlChar extends Primitive> = Assert<
+  OfLength<ControlChar, 1>,
+  `❌ The control character '${ControlChar}' must be a length of 1`
+> &
+  Assert<
+    OfType<ControlChar, Letter>,
+    `❌ The control character '${ControlChar}' can only be a letter from A-Z`
+  >
+
+/**
+ * Assert that a unicode character is valid
+ * @param UnicodeChar The unicode character to check
+ */
+export type IsValidUnicodeChar<UnicodeChar extends Primitive> = Assert<
+  OfLength<UnicodeChar, 4 | 5>,
+  `❌ The unicode character '${UnicodeChar}' must be a length of 4 or 5`
+> &
+  Assert<
+    OfType<UnicodeChar, HexChar>,
+    `❌ The unicode character '${UnicodeChar}' must only contain valid hexidecimal digits`
+  >

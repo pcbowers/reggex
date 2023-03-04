@@ -1,24 +1,21 @@
 import {
   AppenderOpts,
-  Assert,
-  Contains,
-  GroupReferences,
-  Join,
-  Letter,
-  MapWrap,
-  NoOverlap,
-  OfLength,
-  StartsWith,
-  State,
-  NamespaceState
+  ResolveRefs,
+  IsValidInstance,
+  IsValidName,
+  NamespaceState,
+  State as S,
+  StateMerger,
+  _,
+  Prettify
 } from "@types"
-import { createState, DEFAULT_MESSAGE } from "@utils"
+import { createState } from "@utils"
 import { BaseReggex } from "./BaseReggex"
 import { Reggex } from "./Reggex"
 
-export class Appenders<CurState extends State> extends BaseReggex<CurState> {
+export class Appenders<CurState extends S> extends BaseReggex<CurState> {
   private namespaceState = <
-    TState extends State,
+    TState extends S,
     Prefix extends string = "",
     Suffix extends string = ""
   >(
@@ -48,25 +45,28 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
 
   group = <
     // parameter types
-    TState extends State,
+    TState extends S,
     Namespace extends string = "",
     AsPrefix extends boolean = true,
     // return types
     Prefix extends string = AsPrefix extends true ? Namespace : "",
     Suffix extends string = AsPrefix extends true ? "" : Namespace,
-    // assertion types
-    IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
-    HasNoOverlap = NoOverlap<MapWrap<TState["names"], Prefix, Suffix>, CurState["names"]>,
-    OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
-      CurState["names"]
-    >}`
+    NState extends S = NamespaceState<TState, Prefix, Suffix>
   >(
-    instance: Assert<IsValidType, InvalidTypeErr> &
-      BaseReggex<TState> &
-      Assert<HasNoOverlap, OverlapErr>,
+    instance: BaseReggex<TState> & IsValidInstance<NState["names"], CurState["names"]>,
     options?: AppenderOpts<Namespace, AsPrefix>
-  ) => {
+  ): Reggex<
+    StateMerger<
+      CurState,
+      S<
+        NState["msg"],
+        `(?:${NState["prvExp"]}${NState["curExp"]})`,
+        `${CurState["prvExp"]}${CurState["curExp"]}`,
+        [...CurState["names"], ...NState["names"]],
+        [...CurState["groups"], ...NState["groups"]]
+      >
+    >
+  > => {
     const opts = options ?? { namespace: "", asPrefix: true }
     const prefix = (opts.asPrefix ? opts.namespace : "") as Prefix
     const suffix = (opts.asPrefix ? "" : opts.namespace) as Suffix
@@ -86,25 +86,28 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
 
   capture = <
     // parameter types
-    TState extends State,
+    TState extends S,
     Namespace extends string = "",
     AsPrefix extends boolean = true,
     // return types
     Prefix extends string = AsPrefix extends true ? Namespace : "",
     Suffix extends string = AsPrefix extends true ? "" : Namespace,
-    // assertion types
-    IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
-    HasNoOverlap = NoOverlap<MapWrap<TState["names"], Prefix, Suffix>, CurState["names"]>,
-    OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
-      CurState["names"]
-    >}`
+    NState extends S = NamespaceState<TState, Prefix, Suffix>
   >(
-    instance: Assert<IsValidType, InvalidTypeErr> &
-      BaseReggex<TState> &
-      Assert<HasNoOverlap, OverlapErr>,
+    instance: BaseReggex<TState> & IsValidInstance<NState["names"], CurState["names"]>,
     options?: AppenderOpts<Namespace, AsPrefix>
-  ) => {
+  ): Reggex<
+    StateMerger<
+      CurState,
+      S<
+        NState["msg"],
+        `(${NState["prvExp"]}${NState["curExp"]})`,
+        `${CurState["prvExp"]}${CurState["curExp"]}`,
+        [...CurState["names"], ...NState["names"]],
+        [...CurState["groups"], `(${NState["prvExp"]}${NState["curExp"]})`, ...NState["groups"]]
+      >
+    >
+  > => {
     const opts = options ?? { namespace: "", asPrefix: true }
     const prefix = (opts.asPrefix ? opts.namespace : "") as Prefix
     const suffix = (opts.asPrefix ? "" : opts.namespace) as Suffix
@@ -126,41 +129,34 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
 
   namedCapture = <
     // parameter types
-    TState extends State,
+    TState extends S,
     Name extends string,
     Namespace extends string = "",
     AsPrefix extends boolean = true,
     // return types
     Prefix extends string = AsPrefix extends true ? Namespace : "",
     Suffix extends string = AsPrefix extends true ? "" : Namespace,
-    // assertion types
-    NameIsNotEmpty = OfLength<Name, number>,
-    NameEmptyErr = `❌ The Name '${Name}' must be a non-empty string`,
-    NameStartsWithLetter = StartsWith<Name, Letter>,
-    NameDoesNotStartWithLetterErr = `❌ The Name '${Name}' must start with a string`,
-    NameHasNoOverlap = NoOverlap<[Name], CurState["names"]>,
-    NameOverlapErr = `❌ The Name '${Join<NameHasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
-      CurState["names"]
-    >}`,
-    IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
-    InstanceHasNoOverlap = NoOverlap<
-      MapWrap<TState["names"], Prefix, Suffix>,
-      [...CurState["names"], Name]
-    >,
-    InstanceOverlapErr = `❌ The name '${Join<InstanceHasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
-      [...CurState["names"], Name]
-    >}`
+    NState extends S = NamespaceState<TState, Prefix, Suffix>
   >(
-    name: Name &
-      Assert<NameIsNotEmpty, NameEmptyErr> &
-      Assert<NameStartsWithLetter, NameDoesNotStartWithLetterErr> &
-      Assert<NameHasNoOverlap, NameOverlapErr>,
-    instance: Assert<IsValidType, InvalidTypeErr> &
-      BaseReggex<TState> &
-      Assert<InstanceHasNoOverlap, InstanceOverlapErr>,
+    name: Name & IsValidName<Name, CurState["names"]>,
+    instance: BaseReggex<TState> & IsValidInstance<NState["names"], CurState["names"]>,
     options?: AppenderOpts<Namespace, AsPrefix>
-  ) => {
+  ): Reggex<
+    StateMerger<
+      CurState,
+      S<
+        NState["msg"],
+        `(?<${Name}>${NState["prvExp"]}${NState["curExp"]})`,
+        `${CurState["prvExp"]}${CurState["curExp"]}`,
+        [...CurState["names"], Name, ...NState["names"]],
+        [
+          ...CurState["groups"],
+          `(?<${Name}>${NState["prvExp"]}${NState["curExp"]})`,
+          ...NState["groups"]
+        ]
+      >
+    >
+  > => {
     const opts = options ?? { namespace: "", asPrefix: true }
     const prefix = (opts.asPrefix ? opts.namespace : "") as Prefix
     const suffix = (opts.asPrefix ? "" : opts.namespace) as Suffix
@@ -182,25 +178,28 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
 
   append = <
     // parameter types
-    TState extends State,
+    TState extends S,
     Namespace extends string = "",
     AsPrefix extends boolean = true,
     // return types
     Prefix extends string = AsPrefix extends true ? Namespace : "",
     Suffix extends string = AsPrefix extends true ? "" : Namespace,
-    // assertion types
-    IsValidType = Contains<TState["msg"], typeof DEFAULT_MESSAGE>,
-    InvalidTypeErr = `❌ Only finalized expressions ready for RegExp conversion can be appended`,
-    HasNoOverlap = NoOverlap<MapWrap<TState["names"], Prefix, Suffix>, CurState["names"]>,
-    OverlapErr = `❌ The name '${Join<HasNoOverlap>}' has already been used. Make sure none of the following names are duplicated: ${Join<
-      CurState["names"]
-    >}`
+    NState extends S = NamespaceState<TState, Prefix, Suffix>
   >(
-    instance: Assert<IsValidType, InvalidTypeErr> &
-      BaseReggex<TState> &
-      Assert<HasNoOverlap, OverlapErr>,
+    instance: BaseReggex<TState> & IsValidInstance<NState["names"], CurState["names"]>,
     options?: AppenderOpts<Namespace, AsPrefix>
-  ) => {
+  ): Reggex<
+    StateMerger<
+      CurState,
+      S<
+        NState["msg"],
+        NState["curExp"],
+        `${CurState["prvExp"]}${CurState["curExp"]}${NState["prvExp"]}`,
+        [...CurState["names"], ...NState["names"]],
+        [...CurState["groups"], ...NState["groups"]]
+      >
+    >
+  > => {
     const opts = options ?? { namespace: "", asPrefix: true }
     const prefix = (opts.asPrefix ? opts.namespace : "") as Prefix
     const suffix = (opts.asPrefix ? "" : opts.namespace) as Suffix
@@ -219,26 +218,17 @@ export class Appenders<CurState extends State> extends BaseReggex<CurState> {
   }
 
   backreferenceTo = <
-    // parameter types
-    PossibleRefs extends (string | number)[] = GroupReferences<
-      CurState["names"],
-      CurState["groups"]
-    >,
-    Ref extends string | number = PossibleRefs[number],
-    // return types
-    RefType extends string = Ref extends string ? `\\k<${Ref}>` : `\\${Ref}`,
-    // assertion types
-    IsValidRef = Ref extends PossibleRefs[number] ? true : false,
-    InvalidRefErr = `❌ The Reference '${Ref}' is not a valid backreference. Possible values include: ${Join<PossibleRefs>}`
+    Ref extends string | number = ResolveRefs<CurState["names"], CurState["groups"]>[number],
+    RefType extends string = Ref extends string ? `\\k<${Ref}>` : `\\${Ref}`
   >(
-    ref: Assert<IsValidRef, InvalidRefErr> & Ref
-  ) => {
+    ref: Ref
+  ): Reggex<StateMerger<CurState, S<_, `${CurState["curExp"]}${RefType}`, _, _, _>>> => {
     const refType = (typeof ref === "string" ? `\\k<${ref}>` : `\\${ref}`) as RefType
 
     return new Reggex(this.merge({ curExp: `${this.state.curExp}${refType}` }))
   }
 
-  static create() {
+  static create(): Appenders<Prettify<S<"⏳ Select Appender...", "", "", [], []>>> {
     const state = createState({ msg: "⏳ Select Appender..." })
     return new Appenders(state)
   }

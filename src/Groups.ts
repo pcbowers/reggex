@@ -1,33 +1,35 @@
-import { Assert, Join, Letter, NoOverlap, OfLength, StartsWith, State } from "@types"
+import { IsValidName, State as S, StateMerger, _ } from "@types"
 import { BaseReggex } from "./BaseReggex"
 import { Reggex } from "./Reggex"
-
-export class Groups<CurState extends State> extends BaseReggex<CurState> {
-  get nonCapture() {
+export class Groups<CurState extends S> extends BaseReggex<CurState> {
+  get nonCapture(): Reggex<StateMerger<CurState, S<_, `(?:${CurState["curExp"]})`, _, _, _>>> {
     return new Reggex(this.merge({ curExp: `(?:${this.state.curExp})` }))
   }
 
-  get capture() {
+  get capture(): Reggex<
+    StateMerger<
+      CurState,
+      S<_, `(${CurState["curExp"]})`, _, _, [...CurState["groups"], `(${CurState["curExp"]})`]>
+    >
+  > {
     const group = `(${this.state.curExp})` as const
     return new Reggex(this.merge({ curExp: group, groups: [...this.state.groups, group] }))
   }
 
-  namedCapture = <
-    Name extends string,
-    IsNotEmpty = OfLength<Name, number>,
-    EmptyErr = `❌ The Name '${Name}' must be a non-empty string`,
-    NameStartsWithLetter = StartsWith<Name, Letter>,
-    NameDoesNotStartWithLetterErr = `❌ The Name '${Name}' must start with a string`,
-    HasNoOverlap = NoOverlap<[Name], CurState["names"]>,
-    OverlapErr = `❌ The Name '$' has already been used. Make sure none of the following names are duplicated: ${Join<
-      CurState["names"]
-    >}`
-  >(
-    name: Name &
-      Assert<IsNotEmpty, EmptyErr> &
-      Assert<NameStartsWithLetter, NameDoesNotStartWithLetterErr> &
-      Assert<HasNoOverlap, OverlapErr>
-  ) => {
+  namedCapture = <Name extends string>(
+    name: Name & IsValidName<Name, CurState["names"]>
+  ): Reggex<
+    StateMerger<
+      CurState,
+      S<
+        _,
+        `(?<${Name}>${CurState["curExp"]})`,
+        _,
+        [...CurState["names"], Name],
+        [...CurState["groups"], `(?<${Name}>${CurState["curExp"]})`]
+      >
+    >
+  > => {
     const group = `(?<${name}>${this.state.curExp})` as const
     return new Reggex(
       this.merge({

@@ -1,5 +1,5 @@
 import { assign, compileReggex, createState, merger } from "@utils"
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { global, match } from "../index"
 
 const method = Symbol("method")
@@ -79,6 +79,26 @@ describe("utils", () => {
       expect(merge({ groups: [] }).groups).toEqual([])
       expect(merge({ groups: undefined }).groups).toEqual(["test"])
       expect(merge({}).groups).toEqual(["test"])
+    })
+
+    it("merges complex objects appropriately", () => {
+      const merge = merger(createState({ msg: "test" }))
+
+      expect(
+        merge({
+          msg: "test2",
+          curExp: "test2",
+          prvExp: "test2",
+          names: ["test2"],
+          groups: ["test2"]
+        })
+      ).toEqual({
+        msg: "test2",
+        curExp: "test2",
+        prvExp: "test2",
+        names: ["test2"],
+        groups: ["test2"]
+      })
     })
   })
 
@@ -169,7 +189,7 @@ describe("utils", () => {
       const test = compileReggex(() => {
         const test = "test"
         const anyChar = match.anyChar
-        return match.anyChar.as
+        const res = match.anyChar.as
           .namedCapture(test)
           .and.append(anyChar)
           .and.namedCapture(`${test}a` as const, anyChar.as.namedCapture(test), {
@@ -180,7 +200,9 @@ describe("utils", () => {
             namespace: "suf",
             asPrefix: false
           })
-          .and.backreferenceTo("testsuf")
+          .and.backreferenceTo("testsuf").and
+
+        return res
       }, [global])
 
       expect(test).toEqual(/(?<test>.).(?<testa>(?<pretest>.))(?:(?<testsuf>.))\k<testsuf>/g)

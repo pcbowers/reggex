@@ -14,5 +14,7 @@ module.exports = {
     project: true,
     tsConfigRootDir: __dirname
   },
-  rules: {}
+  rules: {
+    "@typescript-eslint/ban-types": "off"
+  }
 }

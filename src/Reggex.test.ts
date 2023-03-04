@@ -1,7 +1,7 @@
 import { GetMethod, RegularMethod } from "@types"
 import { createState, DEFAULT_MESSAGE } from "@utils"
 import { describe, expect, it } from "vitest"
-import { Inputs, match, State, Reggex, global, multiline } from "./index"
+import { global, Inputs, match, multiline, Reggex, State } from "./index"
 
 declare module "./Inputs" {
   interface Inputs<CurState extends State> {
