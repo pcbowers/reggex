@@ -29,6 +29,10 @@ export class Reggex<CurState extends S> extends BaseReggex<CurState> {
     })
   }
 
+  get times() {
+    return this
+  }
+
   get thatRepeats(): Quantifiers<
     StateMerger<CurState, S<"⏳️ Select greedy Quantifier...", _, _, _, _>>
   > & {
