@@ -172,3 +172,8 @@ export type IsValidUnicodeChar<UnicodeChar extends Primitive> = Assert<
     OfType<UnicodeChar, HexChar>,
     `❌ The unicode character '${UnicodeChar}' must only contain valid hexidecimal digits`
   >
+
+export type IsValidSpecificChar<Char extends Primitive> = Assert<
+  OfLength<Char, 1>,
+  `❌ The character '${Char}' must be a length of 1`
+>

@@ -198,6 +198,26 @@ export type MapWrap<
   : []
 
 /**
+ * Convert a string to a tuple of characters
+ * @param T The string to convert
+ */
+export type StringToTuple<T extends Primitive> = T extends `${infer Head}${infer Tail}`
+  ? [Head, ...StringToTuple<Tail>]
+  : []
+
+/**
+ * Wrap all characters in a string in a prefix and suffix
+ * @param T The string to wrap
+ * @param Prefix The prefix to use
+ * @param Suffix The suffix to use
+ */
+export type WrapCharacters<
+  T extends Primitive,
+  Prefix extends Primitive,
+  Suffix extends Primitive
+> = MapWrap<StringToTuple<T>, Prefix, Suffix>
+
+/**
  *  Namespace named capture groups with a prefix or suffix
  * @param TState The state to namespace
  * @param Prefix The prefix to use
