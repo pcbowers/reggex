@@ -16,6 +16,7 @@ coverage/*
 junit.xml
 package-lock.json
 pnpm-lock.yaml
+.turbo
 
 # Editor directories and files
 .npmrc
@@ -28,3 +29,4 @@ pnpm-lock.yaml
 *.njsproj
 *.sln
 *.sw?
+*.tgz
