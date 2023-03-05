@@ -1,5 +1,13 @@
 # reggex
 
+## 0.4.1
+
+### Patch Changes
+
+- 91244f2: Switch to cjs as default
+
+  Rather than specifying `type: "module"`, the `tsup` defaults are now used. This ensures any changes down the line are better supported.
+
 ## 0.4.0
 
 ### Minor Changes
