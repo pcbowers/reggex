@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "outputs": ["coverage/**", "junit.xml"]
+    },
+    "check-exports": {
+      "dependsOn": ["build"]
+    },
+    "lint": {},
+    "publish-packages": {
+      "dependsOn": ["build", "check-exports", "lint"],
+      "cache": false
+    }
+  }
+}

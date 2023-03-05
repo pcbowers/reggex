@@ -12,15 +12,15 @@ lib
 dist
 dist-ssr
 *.local
-coverage/*
+coverage
 junit.xml
 package-lock.json
 pnpm-lock.yaml
+.turbo
 
 # Editor directories and files
 .npmrc
-.vscode/*
-!.vscode/extensions.json
+.vscode
 .idea
 .DS_Store
 *.suo
@@ -28,3 +28,4 @@ pnpm-lock.yaml
 *.njsproj
 *.sln
 *.sw?
+*.tgz

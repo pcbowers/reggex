@@ -7,11 +7,9 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: true,
-      reporter: process.env.CI
-        ? ["text", "text-summary", "cobertura"]
-        : ["text", "text-summary", "html"]
+      reporter: ["text", "text-summary", "cobertura"]
     },
-    reporters: process.env.CI ? ["junit"] : ["verbose"],
-    outputFile: process.env.CI ? "junit.xml" : undefined
+    reporters: ["verbose", "junit"],
+    outputFile: "junit.xml"
   }
 })

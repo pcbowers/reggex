@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
     "target": "ES2017",
     "useDefineForClassFields": true,
     "module": "ESNext",
@@ -23,5 +22,6 @@
       "@types": ["./types/index"],
       "@utils": ["./utils/index"]
     }
-  }
+  },
+  "exclude": ["dist", "node_modules"]
 }
