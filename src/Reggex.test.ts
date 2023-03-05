@@ -112,3 +112,14 @@ describe("Reggex", () => {
     })
   })
 })
+
+describe("TimesReggex", () => {
+  describe("times", () => {
+    it("works", () => {
+      const test = match.anyChar.thatOccurs.exactly(3).times
+
+      expect(test.compile(["g"])).toEqual(/.{3}/g)
+      expect(test.getState()).toEqual(createState({ curExp: ".{3}" }))
+    })
+  })
+})
