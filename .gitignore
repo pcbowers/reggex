@@ -15,6 +15,7 @@ dist-ssr
 coverage/*
 junit.xml
 package-lock.json
+.turbo
 
 # Editor directories and files
 .npmrc
@@ -27,3 +28,4 @@ package-lock.json
 *.njsproj
 *.sln
 *.sw?
+*.tgz
