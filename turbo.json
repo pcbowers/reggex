@@ -8,7 +8,9 @@
     "build": {
       "outputs": ["dist/**"]
     },
-    "test": {},
+    "test": {
+      "outputs": ["coverage/**", "junit.xml"]
+    },
     "check-exports": {
       "dependsOn": ["build"]
     },

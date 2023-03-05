@@ -12,15 +12,14 @@ lib
 dist
 dist-ssr
 *.local
-coverage/*
+coverage
 junit.xml
 package-lock.json
 .turbo
 
 # Editor directories and files
 .npmrc
-.vscode/*
-!.vscode/extensions.json
+.vscode
 .idea
 .DS_Store
 *.suo

@@ -12,7 +12,7 @@ lib
 dist
 dist-ssr
 *.local
-coverage/*
+coverage
 junit.xml
 package-lock.json
 pnpm-lock.yaml
@@ -20,8 +20,7 @@ pnpm-lock.yaml
 
 # Editor directories and files
 .npmrc
-.vscode/*
-!.vscode/extensions.json
+.vscode
 .idea
 .DS_Store
 *.suo
