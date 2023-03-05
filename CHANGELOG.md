@@ -1,5 +1,12 @@
 # reggex
 
+## 0.5.0
+
+### Minor Changes
+
+- 14106ba: Add full list of input characters
+- bac4737: Add Full List of Quantifiers
+
 ## 0.4.1
 
 ### Patch Changes
