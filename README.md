@@ -47,7 +47,7 @@ This library was inspired by [Super Expressive](https://github.com/francisrstoke
 [npm-version-href]: https://npmjs.com/package/reggex
 [npm-downloads-src]: https://img.shields.io/npm/dm/reggex
 [npm-downloads-href]: https://npmjs.com/package/reggex
-[github-actions-src]: https://img.shields.io/github/actions/workflow/status/pcbowers/reggex/main.yml?branch=main
+[github-actions-src]: https://img.shields.io/github/actions/workflow/status/pcbowers/reggex/ci.yml?branch=main
 [github-actions-href]: https://github.com/pcbowers/reggex/actions
 [codecov-src]: https://img.shields.io/codecov/c/github/pcbowers/reggex?token=JG2DBS606N
 [codecov-href]: https://codecov.io/gh/pcbowers/reggex
