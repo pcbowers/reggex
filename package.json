@@ -1,6 +1,6 @@
 {
   "name": "reggex",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A TypeScript library that provides a programmatic and human readable way to create strongly-typed regular expressions",
   "author": "P. Christopher Bowers",
   "license": "MIT",

@@ -1,5 +1,11 @@
 # reggex
 
+## 0.5.1
+
+### Patch Changes
+
+- fa405cd: Bug Fix for Named Captures - Adds better typing when using named captures
+
 ## 0.5.0
 
 ### Minor Changes
