@@ -110,14 +110,14 @@ export type IsValidName<
   Name extends Primitive,
   Names extends Primitive[],
   Overlap extends Primitive = Overlaps<[Name], Names[number]>
-> = Assert<StartsWith<Name, Letter>, `❌ The name '${Name}' must start with a letter`> &
+> = Assert<StartsWith<Name, Letter>, `❌ The name \`${Name}\` must start with a letter`> &
   Assert<
     OfType<Name, Alphanumeric>,
-    `❌ The name '${Name}' must only contain alphanumeric characters`
+    `❌ The name \`${Name}\` must only contain alphanumeric characters`
   > &
   AssertNot<
     Overlap,
-    `❌ The name '${Overlap}' has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
+    `❌ The name \`${Overlap}\` has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
   >
 
 /**
@@ -131,7 +131,7 @@ export type IsValidInstance<
   Overlap extends Primitive = Overlaps<NewNames, Names[number]>
 > = AssertNot<
   Overlap,
-  `❌ The name '${Overlap}' has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
+  `❌ The name \`${Overlap}\` has already been used. Make sure none of the following names are duplicated: ${Join<Names>}`
 >
 
 /**
@@ -140,11 +140,11 @@ export type IsValidInstance<
  */
 export type IsValidHexCode<HexCode extends Primitive> = Assert<
   OfLength<HexCode, 2 | 4>,
-  `❌ The hex code '${HexCode}' must be a length of 2 or 4`
+  `❌ The hex code \`${HexCode}\` must be a length of 2 or 4`
 > &
   Assert<
     OfType<HexCode, HexChar>,
-    `❌ The hex code '${HexCode}' must only contain valid hexidecimal digits`
+    `❌ The hex code \`${HexCode}\` must only contain valid hexidecimal digits`
   >
 
 /**
@@ -153,11 +153,11 @@ export type IsValidHexCode<HexCode extends Primitive> = Assert<
  */
 export type IsValidControlChar<ControlChar extends Primitive> = Assert<
   OfLength<ControlChar, 1>,
-  `❌ The control character '${ControlChar}' must be a length of 1`
+  `❌ The control character \`${ControlChar}\` must be a length of 1`
 > &
   Assert<
     OfType<ControlChar, Letter>,
-    `❌ The control character '${ControlChar}' can only be a letter from A-Z`
+    `❌ The control character \`${ControlChar}\` can only be a letter from A-Z`
   >
 
 /**
@@ -166,14 +166,14 @@ export type IsValidControlChar<ControlChar extends Primitive> = Assert<
  */
 export type IsValidUnicodeChar<UnicodeChar extends Primitive> = Assert<
   OfLength<UnicodeChar, 4 | 5>,
-  `❌ The unicode character '${UnicodeChar}' must be a length of 4 or 5`
+  `❌ The unicode character \`${UnicodeChar}\` must be a length of 4 or 5`
 > &
   Assert<
     OfType<UnicodeChar, HexChar>,
-    `❌ The unicode character '${UnicodeChar}' must only contain valid hexidecimal digits`
+    `❌ The unicode character \`${UnicodeChar}\` must only contain valid hexidecimal digits`
   >
 
 export type IsValidSpecificChar<Char extends Primitive> = Assert<
   OfLength<Char, 1>,
-  `❌ The character '${Char}' must be a length of 1`
+  `❌ The character \`${Char}\` must be a length of 1`
 >

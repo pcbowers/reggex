@@ -138,7 +138,7 @@ export class Appenders<CurState extends S> extends BaseReggex<CurState> {
     Suffix extends string = AsPrefix extends true ? "" : Namespace,
     NState extends S = NamespaceState<TState, Prefix, Suffix>
   >(
-    name: Name & IsValidName<Name, CurState["names"]>,
+    name: Name & IsValidName<Name, [...CurState["names"], ...NState["names"]]>,
     instance: BaseReggex<TState> & IsValidInstance<NState["names"], CurState["names"]>,
     options?: AppenderOpts<Namespace, AsPrefix>
   ): Reggex<

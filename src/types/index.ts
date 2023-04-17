@@ -24,7 +24,7 @@ export type WrapString<
   WrapString extends boolean = true
 > = Value extends string
   ? WrapString extends true
-    ? `'${Value}'${Delimiter}`
+    ? `\`${Value}\`${Delimiter}`
     : `${Value}${Delimiter}`
   : Value extends Primitive
   ? `${Value}${Delimiter}`
