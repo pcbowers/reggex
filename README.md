@@ -10,6 +10,7 @@
 
 ## 📖 Table of Contents
 
+- [📖 Table of Contents](#-table-of-contents)
 - [⚡ Features](#-features)
 - [🧑‍💻 Development](#-development)
 - [💡 Inspiration](#-inspiration)
@@ -24,12 +25,14 @@ This project is open to any contributions via pull requests! Here are some steps
 
 1. Clone the repo (`git clone git@github.com:pcbowers/reggex.git`)
 2. Install the dependencies using pnpm (`pnpm install`)
-3. Run tests interactively using vitest while making changes (`pnpm dev`)
-4. Ensure all the lint tests pass using prettier and eslint (`pnpm lint`)
-5. Ensure the package can be built using tsup (`pnpm build`)
-6. Use changesets to describe any release-dependent changes (`pnpm changeset`)
+3. Run tests interactively using vitest while making changes (`pnpm run dev`)
+4. Ensure all the lint tests pass using prettier and eslint (`pnpm run lint`)
+5. Ensure the package can be built using tsup (`pnpm run build`)
+6. Use changesets to describe any release-dependent changes (`pnpm run changeset`)
 7. Commit and Push your changes, ensuring any CI workflows pass
 8. Create a Pull Request to begin the review process and get your changes merged!
+
+Tired of running all these commands? Use `pnpm run ci` to run the tests, lint, build, and export checks all at once!
 
 **More details for the curious:**
 
