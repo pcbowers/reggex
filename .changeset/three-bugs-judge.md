@@ -1,5 +1,0 @@
----
-"reggex": patch
----
-
-Update dependencies

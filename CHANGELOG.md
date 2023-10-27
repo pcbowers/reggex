@@ -1,5 +1,12 @@
 # reggex
 
+## 0.5.2
+
+### Patch Changes
+
+- 86d6b43: Update README
+- faa96e0: Update dependencies
+
 ## 0.5.1
 
 ### Patch Changes
